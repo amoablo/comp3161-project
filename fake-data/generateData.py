@@ -1,4 +1,7 @@
 from faker import Faker
+from faker.providers import BaseProvider
+import random
+
 
 
 # Create the tables in the sql file
@@ -161,7 +164,8 @@ insert into users (first_name, last_name, email, gender, password) values ('fnam
 
 # Generate the fake data 
 
-fake = Faker()
+
+# data dictionary
 fake_data = {
     "user":{
         "fname":[],
@@ -236,13 +240,55 @@ fake_data = {
 
 }
 
-# create key value pairs with list
-# fake_data["u"]
 
-# for _ in range(100):
-#     fake_data["first_name"].append( fake.first_name() )
-#     fake_data["last_name"].append( fake.last_name() )
+# num_fake_users = 200000
+# num_fake_recipes = 600000
+num_fake_users = 2
+num_fake_recipes = 6
 
+fake = Faker(['en-US', 'en_US', 'en_US', 'en-US'])
+Faker.seed(129)
+
+# ===========================
+#   populate user table 
+#============================
+
+
+# create new provider class
+class userProvider(BaseProvider):
+    def gender(self):
+        return random.choice(["M","F","O"])
+    
+fake.add_provider(userProvider)
+
+for _ in range(num_fake_users):
+    fake_data["user"]["fname"].append( fake.first_name() )
+    fake_data["user"]["lname"].append( fake.last_name() )
+    fake_data["user"]["email"].append( fake.unique.email() )
+    fake_data["user"]["gender"].append( fake.gender() )
+    fake_data["user"]["password"].append( fake.password() )
+
+# print(fake_data["user"])
+
+# ===========================
+#   populate recipe table 
+#============================
+
+
+for _ in range(num_fake_recipes):
+    fake_data["recipe"]["name"].append( fake.text(max_nb_chars=50 ))
+    fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
+
+# ===========================
+#   populate ingredient table 
+#============================
+
+
+print(fake_data["ingredient"])
+
+for _ in range(num_fake_recipes):
+    fake_data["ingredient"]["name"].append( fake.text(max_nb_chars=50 ))
+    fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
 
 # Write the string to the sql file 
 text_file = open("meal_planer_fake_data.sql", "w")
