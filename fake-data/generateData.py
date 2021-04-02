@@ -310,8 +310,8 @@ fake_data["measurement"]["unit"] = ["count","lb"]
 #============================
 
 for i_id in range(len(fake_data["ingredient"]["name"])):
-    fake_data["measured_in"]["ingredient_id"].append(i_id)
-    fake_data["measured_in"]["measurement_id"].append(random.randint(0,len(fake_data["measurement"]["unit"])-1))
+    fake_data["measured_in"]["ingredient_id"].append(i_id+1)
+    fake_data["measured_in"]["measurement_id"].append(random.randint(1,len(fake_data["measurement"]["unit"])))
 
 
 
@@ -322,8 +322,8 @@ for i_id in range(len(fake_data["ingredient"]["name"])):
 for r_id in range(len(fake_data["recipe"]["name"])):
     ingredients_id = random.sample(range(num_ingredients), max_num_recipe_ingredient)
     for i_id in ingredients_id:
-        fake_data["made_of"]["recipe_id"].append(r_id)
-        fake_data["made_of"]["ingredient_id"].append(i_id)
+        fake_data["made_of"]["recipe_id"].append(r_id+1)
+        fake_data["made_of"]["ingredient_id"].append(i_id+1)
         fake_data["made_of"]["amount"].append(random.randint(1, max_ingredient_amount-1))
     
 
@@ -338,8 +338,8 @@ for r_id in range(len(fake_data["recipe"]["name"])):
 inst_id = 0
 for r_id in range(len(fake_data["recipe"]["name"])):
     for steps in range(random.randint(1,max_instructions_steps)):
-        fake_data["prepare"]["recipe_id"].append(r_id)
-        fake_data["prepare"]["instruction_id"].append(inst_id)
+        fake_data["prepare"]["recipe_id"].append(r_id+1)
+        fake_data["prepare"]["instruction_id"].append(inst_id+1)
         fake_data["prepare"]["step_no"].append(steps+1)
         fake_data["instruction"]["step_no"].append(steps+1)
         fake_data["instruction"]["description"].append(fake.text(max_nb_chars=50 ))
@@ -414,6 +414,24 @@ for indx in range(len(fake_data["measurement"]["unit"])):
 
 
 
+# insert instruction
+
+meal_planner_fake_sql += """
+-- Insert instruction data
+
+"""
+
+for indx in range(len(fake_data["instruction"]["step_no"])):
+    insert_command = """insert into instructions (step_no, step_description) values ( '{}', '{}');
+""".format(
+        fake_data["instruction"]["step_no"][indx],
+        fake_data["instruction"]["description"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+
 
 # insert measured in
 
@@ -429,6 +447,22 @@ for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
         fake_data["measured_in"]["measurement_id"][indx]
     )
     meal_planner_fake_sql+= insert_command
+
+# insert measured in
+
+# meal_planner_fake_sql += """
+# -- Insert measured in data
+
+# """
+
+# for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
+#     insert_command = """insert into measured_in (ingredient_id, measurement_id)values ( (select ingredient_id from ingredients where ingredient_id = {}), (select measurement_id from measurement where measurement_id = {}));
+# """.format(
+#         fake_data["measured_in"]["ingredient_id"][indx],
+#         fake_data["measured_in"]["measurement_id"][indx]
+#     )
+#     meal_planner_fake_sql+= insert_command
+
 
 
 # insert made of
@@ -449,23 +483,6 @@ for indx in range(len(fake_data["made_of"]["recipe_id"])):
 
 
 
-# insert instruction
-
-meal_planner_fake_sql += """
--- Insert instruction data
-
-"""
-
-for indx in range(len(fake_data["instruction"]["step_no"])):
-    insert_command = """insert into instrctions (step_no, step_description) values ( '{}', '{}');
-""".format(
-        fake_data["instruction"]["step_no"][indx],
-        fake_data["instruction"]["description"][indx],
-    )
-    meal_planner_fake_sql+= insert_command
-
-
-
 # insert prepare
 
 meal_planner_fake_sql += """
@@ -481,7 +498,6 @@ for indx in range(len(fake_data["prepare"]["recipe_id"])):
         fake_data["prepare"]["step_no"][indx]
     )
     meal_planner_fake_sql+= insert_command
-
 
 
 

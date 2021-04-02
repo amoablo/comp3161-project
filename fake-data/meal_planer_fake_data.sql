@@ -176,27 +176,27 @@ insert into ingredients (name) values ( 'Morning.');
 insert into measurement (unit) values ( 'count');
 insert into measurement (unit) values ( 'lb');
 
+-- Insert instruction data
+
+insert into instructions (step_no, step_description) values ( '1', 'Again health on read court land two.');
+insert into instructions (step_no, step_description) values ( '1', 'Information system free street person good.');
+
 -- Insert measured in data
 
-insert into measured_in (ingredient_id, measurement_id) values ( '0', '0');
-insert into measured_in (ingredient_id, measurement_id) values ( '1', '1');
-insert into measured_in (ingredient_id, measurement_id) values ( '2', '1');
-insert into measured_in (ingredient_id, measurement_id) values ( '3', '0');
-insert into measured_in (ingredient_id, measurement_id) values ( '4', '0');
+insert into measured_in (ingredient_id, measurement_id) values ( '1', '2');
+insert into measured_in (ingredient_id, measurement_id) values ( '2', '2');
+insert into measured_in (ingredient_id, measurement_id) values ( '3', '1');
+insert into measured_in (ingredient_id, measurement_id) values ( '4', '1');
+insert into measured_in (ingredient_id, measurement_id) values ( '5', '2');
 
 -- Insert made of data
 
-insert into made_of (recipe_id, ingredient_id, amount) values ( '0', '3', '4');
-insert into made_of (recipe_id, ingredient_id, amount) values ( '0', '4', '2');
-insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '4', '7');
-insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '3', '4');
-
--- Insert instruction data
-
-insert into instrctions (step_no, step_description) values ( '1', 'Again health on read court land two.');
-insert into instrctions (step_no, step_description) values ( '1', 'Information system free street person good.');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '3', '9');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '2', '8');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '2', '4', '3');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '2', '3', '6');
 
 -- Insert prepare data
 
-insert into prepare (recipe_id, instruction_id, step_no) values ( '0', '0', '1');
 insert into prepare (recipe_id, instruction_id, step_no) values ( '1', '1', '1');
+insert into prepare (recipe_id, instruction_id, step_no) values ( '2', '2', '1');
