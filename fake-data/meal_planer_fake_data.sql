@@ -152,5 +152,51 @@ DELIMITER ;
 
 -- Insertions
 
-insert into users (first_name, last_name, email, gender, password) values ( 'Brenda', 'Casey', 'wilkersonpamela@yahoo.com', 'O', '_3_kKjhgk)');
+
+-- Insert Users data
+
+insert into users (first_name, last_name, email, gender, password) values ( 'Brenda', 'Casey', 'wilkersonpamela@yahoo.com', 'M', '_3_kKjhgk)');
 insert into users (first_name, last_name, email, gender, password) values ( 'John', 'Thompson', 'toddbrown@phillips.net', 'M', 'e21P1XWq)W');
+
+-- Insert recipe data
+
+insert into recipe (name, created_date) values ( 'Himself push sell account.', '2019-10-18');
+insert into recipe (name, created_date) values ( 'Professor ability analysis hotel.', '2019-06-09');
+
+-- Insert ingredients data
+
+insert into ingredients (name) values ( 'Resource.');
+insert into ingredients (name) values ( 'If suffer.');
+insert into ingredients (name) values ( 'Imagine.');
+insert into ingredients (name) values ( 'Other.');
+insert into ingredients (name) values ( 'Morning.');
+
+-- Insert measurement data
+
+insert into measurement (unit) values ( 'count');
+insert into measurement (unit) values ( 'lb');
+
+-- Insert measured in data
+
+insert into measured_in (ingredient_id, measurement_id) values ( '0', '0');
+insert into measured_in (ingredient_id, measurement_id) values ( '1', '1');
+insert into measured_in (ingredient_id, measurement_id) values ( '2', '1');
+insert into measured_in (ingredient_id, measurement_id) values ( '3', '0');
+insert into measured_in (ingredient_id, measurement_id) values ( '4', '0');
+
+-- Insert made of data
+
+insert into made_of (recipe_id, ingredient_id, amount) values ( '0', '3', '4');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '0', '4', '2');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '4', '7');
+insert into made_of (recipe_id, ingredient_id, amount) values ( '1', '3', '4');
+
+-- Insert instruction data
+
+insert into instrctions (step_no, step_description) values ( '1', 'Again health on read court land two.');
+insert into instrctions (step_no, step_description) values ( '1', 'Information system free street person good.');
+
+-- Insert prepare data
+
+insert into prepare (recipe_id, instruction_id, step_no) values ( '0', '0', '1');
+insert into prepare (recipe_id, instruction_id, step_no) values ( '1', '1', '1');

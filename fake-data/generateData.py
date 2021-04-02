@@ -340,14 +340,20 @@ for r_id in range(len(fake_data["recipe"]["name"])):
     for steps in range(random.randint(1,max_instructions_steps)):
         fake_data["prepare"]["recipe_id"].append(r_id)
         fake_data["prepare"]["instruction_id"].append(inst_id)
-        fake_data["prepare"]["step_no"].append(steps)
-        fake_data["instruction"]["step_no"].append(steps)
+        fake_data["prepare"]["step_no"].append(steps+1)
+        fake_data["instruction"]["step_no"].append(steps+1)
         fake_data["instruction"]["description"].append(fake.text(max_nb_chars=50 ))
         inst_id+=1
 
 # insert the data into the sql
 
 # insert users
+
+meal_planner_fake_sql += """
+-- Insert Users data
+
+"""
+
 for indx in range(len(fake_data["user"]["fname"])):
     insert_command = """insert into users (first_name, last_name, email, gender, password) values ( '{}', '{}', '{}', '{}', '{}');
 """.format(
@@ -358,6 +364,125 @@ for indx in range(len(fake_data["user"]["fname"])):
         fake_data["user"]["password"][indx]
     )
     meal_planner_fake_sql+= insert_command
+
+
+# insert recipes
+
+meal_planner_fake_sql += """
+-- Insert recipe data
+
+"""
+
+for indx in range(len(fake_data["recipe"]["name"])):
+    insert_command = """insert into recipe (name, created_date) values ( '{}', '{}');
+""".format(
+        fake_data["recipe"]["name"][indx],
+        fake_data["recipe"]["date"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert ingredients
+
+meal_planner_fake_sql += """
+-- Insert ingredients data
+
+"""
+
+for indx in range(len(fake_data["ingredient"]["name"])):
+    insert_command = """insert into ingredients (name) values ( '{}');
+""".format(
+        fake_data["ingredient"]["name"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+# insert measurement
+
+meal_planner_fake_sql += """
+-- Insert measurement data
+
+"""
+
+for indx in range(len(fake_data["measurement"]["unit"])):
+    insert_command = """insert into measurement (unit) values ( '{}');
+""".format(
+        fake_data["measurement"]["unit"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+
+# insert measured in
+
+meal_planner_fake_sql += """
+-- Insert measured in data
+
+"""
+
+for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
+    insert_command = """insert into measured_in (ingredient_id, measurement_id) values ( '{}', '{}');
+""".format(
+        fake_data["measured_in"]["ingredient_id"][indx],
+        fake_data["measured_in"]["measurement_id"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+# insert made of
+
+meal_planner_fake_sql += """
+-- Insert made of data
+
+"""
+
+for indx in range(len(fake_data["made_of"]["recipe_id"])):
+    insert_command = """insert into made_of (recipe_id, ingredient_id, amount) values ( '{}', '{}', '{}');
+""".format(
+        fake_data["made_of"]["recipe_id"][indx],
+        fake_data["made_of"]["ingredient_id"][indx],
+        fake_data["made_of"]["amount"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert instruction
+
+meal_planner_fake_sql += """
+-- Insert instruction data
+
+"""
+
+for indx in range(len(fake_data["instruction"]["step_no"])):
+    insert_command = """insert into instrctions (step_no, step_description) values ( '{}', '{}');
+""".format(
+        fake_data["instruction"]["step_no"][indx],
+        fake_data["instruction"]["description"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert prepare
+
+meal_planner_fake_sql += """
+-- Insert prepare data
+
+"""
+
+for indx in range(len(fake_data["prepare"]["recipe_id"])):
+    insert_command = """insert into prepare (recipe_id, instruction_id, step_no) values ( '{}', '{}', '{}');
+""".format(
+        fake_data["prepare"]["recipe_id"][indx],
+        fake_data["prepare"]["instruction_id"][indx],
+        fake_data["prepare"]["step_no"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
 
 
 # Write the string to the sql file 
