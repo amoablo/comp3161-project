@@ -158,7 +158,7 @@ DELIMITER //
 
 DELIMITER ;
 
-insert into users (first_name, last_name, email, gender, password) values ('fname', 'lname',	'fname@ds.com','M', 'asdfsdasd');
+-- Insertions
 
 """
 
@@ -240,11 +240,19 @@ fake_data = {
 
 }
 
+# Fake data Configuration Variables
 
 # num_fake_users = 200000
 # num_fake_recipes = 600000
 num_fake_users = 2
-num_fake_recipes = 6
+num_fake_recipes = 2
+num_ingredients = 5
+max_num_recipe_ingredient = 2 #this needs to be less than or equal to the num_ingredients
+max_ingredient_amount = 10
+max_instructions_steps = 1
+
+
+
 
 fake = Faker(['en-US', 'en_US', 'en_US', 'en-US'])
 Faker.seed(129)
@@ -279,16 +287,78 @@ for _ in range(num_fake_recipes):
     fake_data["recipe"]["name"].append( fake.text(max_nb_chars=50 ))
     fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
 
+
+
 # ===========================
 #   populate ingredient table 
 #============================
 
+for _ in range(num_ingredients):
+    fake_data["ingredient"]["name"].append( fake.text(max_nb_chars=10 ))
 
-print(fake_data["ingredient"])
 
-for _ in range(num_fake_recipes):
-    fake_data["ingredient"]["name"].append( fake.text(max_nb_chars=50 ))
-    fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
+# ===========================
+#   populate measurement table 
+#============================
+
+fake_data["measurement"]["unit"] = ["count","lb"]
+
+
+
+# ===========================
+#   populate measureed in table 
+#============================
+
+for i_id in range(len(fake_data["ingredient"]["name"])):
+    fake_data["measured_in"]["ingredient_id"].append(i_id)
+    fake_data["measured_in"]["measurement_id"].append(random.randint(0,len(fake_data["measurement"]["unit"])-1))
+
+
+
+# ===========================
+#   populate made_of table 
+#============================
+
+for r_id in range(len(fake_data["recipe"]["name"])):
+    ingredients_id = random.sample(range(num_ingredients), max_num_recipe_ingredient)
+    for i_id in ingredients_id:
+        fake_data["made_of"]["recipe_id"].append(r_id)
+        fake_data["made_of"]["ingredient_id"].append(i_id)
+        fake_data["made_of"]["amount"].append(random.randint(1, max_ingredient_amount-1))
+    
+
+
+
+# ===========================
+#   populate prepare and instruction id table 
+#============================
+
+
+
+inst_id = 0
+for r_id in range(len(fake_data["recipe"]["name"])):
+    for steps in range(random.randint(1,max_instructions_steps)):
+        fake_data["prepare"]["recipe_id"].append(r_id)
+        fake_data["prepare"]["instruction_id"].append(inst_id)
+        fake_data["prepare"]["step_no"].append(steps)
+        fake_data["instruction"]["step_no"].append(steps)
+        fake_data["instruction"]["description"].append(fake.text(max_nb_chars=50 ))
+        inst_id+=1
+
+# insert the data into the sql
+
+# insert users
+for indx in range(len(fake_data["user"]["fname"])):
+    insert_command = """insert into users (first_name, last_name, email, gender, password) values ( '{}', '{}', '{}', '{}', '{}');
+""".format(
+        fake_data["user"]["fname"][indx],
+        fake_data["user"]["lname"][indx],
+        fake_data["user"]["email"][indx],
+        fake_data["user"]["gender"][indx],
+        fake_data["user"]["password"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
 
 # Write the string to the sql file 
 text_file = open("meal_planer_fake_data.sql", "w")

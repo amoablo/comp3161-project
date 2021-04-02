@@ -150,5 +150,7 @@ DELIMITER //
 
 DELIMITER ;
 
-insert into users (first_name, last_name, email, gender, password) values ('fname', 'lname',	'fname@ds.com','M', 'asdfsdasd');
+-- Insertions
 
+insert into users (first_name, last_name, email, gender, password) values ( 'Brenda', 'Casey', 'wilkersonpamela@yahoo.com', 'O', '_3_kKjhgk)');
+insert into users (first_name, last_name, email, gender, password) values ( 'John', 'Thompson', 'toddbrown@phillips.net', 'M', 'e21P1XWq)W');
