@@ -55,7 +55,7 @@ def login():
             if user is not None and check_password_hash(user.password, password):
                 login_user(user)    # load into session
                 flash('Logged in successfully.', 'success') # flash a message to the user
-                return redirect(url_for("secure_page"))  # redirect to a secure-page route
+                return redirect(url_for("recipes"))  # redirect to a secure-page route
             else:
                 flash('Username or Password is incorrect.', 'danger')
     flash_errors(form)
@@ -81,7 +81,7 @@ def join():
             if user is not None and check_password_hash(user.password, password):
                 login_user(user)    # load into session
                 flash('Joined successfully.', 'success') # flash a message to the user
-                return redirect(url_for("secure_page"))  # redirect to a secure-page route
+                return redirect(url_for("recipes"))  # redirect to a secure-page route
             else:
                 flash('Username or Password is incorrect.', 'danger')
     flash_errors(form)
