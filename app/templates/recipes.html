@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+<div class="recipe-header-container d-flex">
+    <div class="recipe-header d-flex flex-column align-items-center">
+        <h2>Recipes</h2>
+        <div class="form">
+            <div class="form-group mb-2 search-comp d-flex">
+                <label class="sr-only" for="search">Search</label>
+                <input type="search" name="search" id="search" class="form-control mb-2 mr-sm-2" placeholder="Search Recipes" />
+                <button class="btn mb-2 search-btn custom-btn">Search</button> 
+            </div>
+        </div>
+    </div>
+</div>
+
+<ul class="recipes row row-cols-1 row-cols-md-4 g-4">
+    {% for recipe in recipes %}
+    <li class="recipe">
+        <div class="col">
+            <a href="{{ url_for('getImage', filename=recipe) }}" class='card'>
+                <img src="{{ url_for('getImage', filename=recipe) }}" class="card-img-top" alt="Recipe image">
+                <div class="card-body">
+                    <p>Placeat culpa quibusdam quibusdam non et commodi</p>
+                </div>
+            </a>
+        </div>
+    </li>
+    {% endfor %}
+</ul>
+
+
+{%endblock%}
