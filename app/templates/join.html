@@ -10,7 +10,7 @@
   <form action="{{ url_for('login') }}" method="post" class="login-form rounded">
     {{ form.csrf_token }}
     
-    <h4 class='form-header'>Sign In</h4>
+    <h4 class='form-header'>Join</h4>
     <div class="form-group">
       {{ form.email.label }}
       {{ form.email(class='form-control', placeholder="email") }}
@@ -20,12 +20,12 @@
       {{ form.password(class='form-control', placeholder="password") }}
     </div>
     <div class="submit-btn-container d-flex justify-content-center">
-      <button type="submit" name="submit" class="btn custom-btn submit-btn">Sign in</button>
+      <button type="submit" name="submit" class="btn custom-btn submit-btn">Join</button>
     </div>
   </form>
   <div class="login-page-footer d-flex justify-content-center mt-4 gap-3">
-    <span class='no-account-text mt-2'>Dont have an account?</span>
-    <a class="btn join-btn2 custom-btn" href="#" role="button">Join</a>
+    <span class='no-account-text mt-2'>Already have an account?</span>
+    <a class="btn join-btn2 custom-btn" href="#" role="button">Sign In</a>
   </div>
 </div>
 {% endblock %}

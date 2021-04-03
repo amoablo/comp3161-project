@@ -43,9 +43,9 @@ body {
     min-width: 14rem;
     justify-content: space-between;
 }
-.btn{
-    color: black !important;
-}
+
+.btn {color: black !important; }
+
 .custom-btn{
     width: 6rem;
     height: 2.5rem;
@@ -62,7 +62,10 @@ body {
 }
 .join-btn{
     background-color: #EFF6EE;
-       
+}
+.join-btn2{
+    background-color: #273043;
+    color: #fff !important;
 }
 .join-btn:hover{
     background-color: #273043;
@@ -72,7 +75,7 @@ body {
     border: 1px solid white;
     color: #fff !important;
 }
-.search-btn{
+.search-btn, .submit-btn{
     background-color: #519872;
     color: white !important;
 }
@@ -103,4 +106,26 @@ li{
 a{
     text-decoration: none;
     color: #000;
+}
+.login-form{
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    padding: 2.5rem 8rem 2.5rem 8rem;
+}
+.login-form label{
+    font-weight: 600;
+    padding-bottom: 0.2rem;
+}
+.form-group{
+    padding-bottom: 2rem;
+}
+.login-page{
+    justify-content:center;
+}
+.form-header{
+    text-align: center;
+    padding-bottom: 1rem;
+    font-weight: 600;
 }

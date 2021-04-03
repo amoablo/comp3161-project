@@ -19,36 +19,32 @@ def recipes():
     return render_template('recipes.html',recipes=images)
 
 @app.route('/mealPlan')
+@login_required
 def mealPlan():
     """Render website's meal plan page."""
     return render_template('mealplan.html')
 
 @app.route('/kitchen')
+@login_required
 def kitchen():
     """Render website's kitchen page."""
     return render_template('kitchen.html')
 
 @app.route('/shoppingList')
+@login_required
 def shoppingList():
     """Render website's shopping list page."""
     return render_template('shoppinglist.html')
 
-@app.route('/secure-page')
-@login_required
-def secure_page():
-    """Render a page on our website that only logged in users can access."""
-    return render_template('secure_page.html')
-
-
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('secure_page'))
+        return redirect(url_for('recipe'))
     form = LoginForm()
     if request.method == "POST":
         if form.validate_on_submit():
             # Get the username and password values from the form.
-            username = form.username.data
+            email = form.username.data
             password = form.password.data
 
             # query database for a user based on the username
@@ -64,6 +60,32 @@ def login():
                 flash('Username or Password is incorrect.', 'danger')
     flash_errors(form)
     return render_template("login.html", form=form)
+
+
+@app.route("/join", methods=["GET", "POST"])
+def join():
+    if current_user.is_authenticated:
+        return redirect(url_for('recipe'))
+    form = LoginForm()
+    if request.method == "POST":
+        if form.validate_on_submit():
+            # Get the username and password values from the form.
+            email = form.username.data
+            password = form.password.data
+
+            # query database for a user based on the username
+
+            user = ''
+
+            # validate the password and ensure that a user was found
+            if user is not None and check_password_hash(user.password, password):
+                login_user(user)    # load into session
+                flash('Joined successfully.', 'success') # flash a message to the user
+                return redirect(url_for("secure_page"))  # redirect to a secure-page route
+            else:
+                flash('Username or Password is incorrect.', 'danger')
+    flash_errors(form)
+    return render_template("join.html", form=form)
 
 
 @app.route("/logout")
