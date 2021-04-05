@@ -61,6 +61,7 @@ create table recipe(
     name varchar(255),
     created_date date,
     calorie int,
+    image_url text,
     primary key(recipe_id)
 );
 
@@ -196,7 +197,8 @@ fake_data = {
     "recipe":{
         "name":[],
         "date":[],
-        "calorie":[]
+        "calorie":[],
+        "image_url":[]
     },
     "instruction":{
         "step_no":[],
@@ -267,6 +269,8 @@ max_ingredient_amount = 10
 max_instructions_steps = 7
 max_calorie = 2000
 
+images = ["recipes/test.png","recipes/test2.png"]
+
 
 
 
@@ -278,10 +282,14 @@ Faker.seed(129)
 #============================
 
 
-# create new provider class
+# create new provider classs
 class userProvider(BaseProvider):
     def gender(self):
         return random.choice(["M","F","O"])
+
+class recipeProvider(BaseProvider):
+    def image_url(self):
+        return random.choice(images)
     
 fake.add_provider(userProvider)
 
@@ -303,6 +311,7 @@ for _ in range(num_fake_recipes):
     fake_data["recipe"]["name"].append( fake.text(max_nb_chars=50 ))
     fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
     fake_data["recipe"]["calorie"].append( random.randint(1, max_calorie) )
+    fake_data["recipe"]["image_url"].append( fake.image_url() )
 
 
 
@@ -426,11 +435,12 @@ meal_planner_fake_sql += """
 """
 
 for indx in range(len(fake_data["recipe"]["name"])):
-    insert_command = """insert into recipe (name, created_date, calorie) values ( '{}', '{}', '{}');
+    insert_command = """insert into recipe (name, created_date, calorie, image_url) values ( '{}', '{}', '{}', '{}');
 """.format(
         fake_data["recipe"]["name"][indx],
         fake_data["recipe"]["date"][indx],
-        fake_data["recipe"]["calorie"][indx]
+        fake_data["recipe"]["calorie"][indx],
+        fake_data["recipe"]["image_url"][indx]
     )
     meal_planner_fake_sql+= insert_command
 
