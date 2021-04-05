@@ -249,7 +249,7 @@ num_fake_recipes = 6
 num_ingredients = 20
 max_num_recipe_ingredient = 8 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
-max_instructions_steps = 8
+max_instructions_steps = 7
 
 
 

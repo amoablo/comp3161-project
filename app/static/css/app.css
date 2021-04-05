@@ -1,0 +1,179 @@
+body {
+    padding-top: 5rem;
+    background-color: #f4f4f9;
+    font-family: 'Open Sans', sans-serif;
+}
+.navbar{
+    background-color:#519872;
+    color: #F4F4F9;
+    padding-left: 2%;
+    padding-right: 2%;
+    font-size:larger;
+}
+.navbar-brand{
+    font-family: 'Cinzel Decorative', cursive;
+    display:flex;
+    flex-direction: row;
+    column-count: 2;
+    column-gap: 0.5rem;
+    align-items: center;
+    justify-content:space-evenly;
+    margin-right: 2%;
+}
+.brand-logo{
+    display: inline-block;
+}
+.brand-name{
+    display: inline-block;
+    padding: 0.312rem 0 0 0;
+    border-bottom: 2px solid #fff;
+}
+
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+
+.navbar-collapse{
+    justify-content: space-between;
+}
+.user-section{
+    flex-direction: column;
+    column-count: 2;
+    min-width: 14rem;
+    justify-content: space-between;
+}
+
+.btn {color: black !important; }
+
+.custom-btn{
+    width: 6rem;
+    height: 2.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.custom-btn:hover{
+    box-shadow: rgba(0, 0, 0, 0.11) 0px 5px 10px, rgba(0, 0, 0, 0.14) 0px 3px 3px;
+    opacity: 0.9;
+}
+.custom-btn:focus{
+    box-shadow: none;
+}
+.join-btn{
+    background-color: #EFF6EE;
+}
+.join-btn2{
+    background-color: #273043;
+    color: #fff !important;
+}
+.join-btn:hover{
+    background-color: #273043;
+    color: white !important;
+}
+.login-btn{
+    border: 1px solid white;
+    color: #fff !important;
+}
+.search-btn, .submit-btn{
+    background-color: #519872;
+    color: white !important;
+}
+.search-comp{
+    width: 40vw;
+    column-gap: 3%;
+    justify-content:center;
+    margin-bottom: 1.5rem !important;
+}
+#search:focus{
+    border: 1px solid #519872;
+    box-shadow: none;
+}
+h2, h1{
+    margin-bottom: 1.5rem;
+    font-family: 'Cinzel Decorative', cursive;
+}
+.recipe-header-container{
+    justify-content:center;
+}
+.card img{
+    height: 15rem;
+    max-height: 100%;
+}
+li{
+    list-style: none;
+}
+a{
+    text-decoration: none;
+    color: #000;
+}
+.login-form{
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    padding: 2.5rem 8rem 2.5rem 8rem;
+}
+.login-form label{
+    font-weight: 600;
+    padding-bottom: 0.2rem;
+}
+.form-group{
+    padding-bottom: 2rem;
+}
+.login-page{
+    justify-content:center;
+}
+.form-header{
+    text-align: center;
+    padding-bottom: 1rem;
+    font-weight: 600;
+}
+.pantry{
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    min-height: 70vh;
+}
+.pantry table{
+    width:50%;
+}
+.pantry thead{
+    text-align: center;
+    color: #fff;
+    background-color:#273043;
+}
+.pantry td, .pantry tbody th{
+    padding-left: 1rem;
+}
+.pantry tbody th, .pantry tbody td{
+    font-weight: 600;
+}
+
+footer{
+    background-color:#273043;
+}
+.home-page h1, h2{
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.home-page{
+    height: 70vh;
+}
+.home-page h2{
+    text-align: center;
+}
+.group-members{
+    display: flex;
+    flex-direction: row;
+    column-gap: 12rem;
+}
+.member{
+    /* list-style-type:square; */
+    padding-bottom: 0.8rem;
+    font-weight: 600;
+}
+.members-heading{
+    display: flex;
+    justify-content: center;
+}
