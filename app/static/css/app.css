@@ -129,3 +129,51 @@ a{
     padding-bottom: 1rem;
     font-weight: 600;
 }
+.pantry{
+    display: flex;
+    flex-direction: column;
+    align-items:center;
+    min-height: 70vh;
+}
+.pantry table{
+    width:50%;
+}
+.pantry thead{
+    text-align: center;
+    color: #fff;
+    background-color:#273043;
+}
+.pantry td, .pantry tbody th{
+    padding-left: 1rem;
+}
+.pantry tbody th, .pantry tbody td{
+    font-weight: 600;
+}
+
+footer{
+    background-color:#273043;
+}
+.home-page h1, h2{
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.home-page{
+    height: 70vh;
+}
+.home-page h2{
+    text-align: center;
+}
+.group-members{
+    display: flex;
+    flex-direction: row;
+    column-gap: 12rem;
+}
+.member{
+    /* list-style-type:square; */
+    padding-bottom: 0.8rem;
+    font-weight: 600;
+}
+.members-heading{
+    display: flex;
+    justify-content: center;
+}

@@ -25,7 +25,7 @@ def mealPlan():
     return render_template('mealplan.html')
 
 @app.route('/pantry')
-@login_required
+# @login_required
 def pantry():
     """Render website's pantry page."""
     return render_template('pantry.html')
