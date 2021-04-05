@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block main %}
+
+    <h1>My Recipes</h1>
+    <div class="card-deck">	
+        {% for p in lst %}
+
+            <div class="card">
+
+              <div class="">
+                <a class="btn btn-block specific-green" href="{{ url_for('getRecipe', Recipieid= p[0]) }}">View Recipie</a>
+            </div>
+                <div class="card-body">
+                  <h5 class="card-title font-weight-bold mb-1">{{ p[1] }}</h5>
+                  <p class="card-text text-muted"><i class="fas fa-map-marker-alt"></i>  {{ p[2] }}</p>
+                  <span class="badge badge-pill badge-primary px-3 py-2">${{ p[1] }}</span>
+                </div>
+       
+                {% endfor %}
+              </div>
+
+
+{%endblock%}

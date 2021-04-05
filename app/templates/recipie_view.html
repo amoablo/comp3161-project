@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block main %}
+<div class="outer">
+		<div class="card mb-3 sh" style="max-width: 750px;">
+			<div class="row no-gutters">
+			<div class="col-md-8">
+				<div class="card-body">
+				<h5 class="card-title">{{query[0]}}</h5>
+				<button type="button" class="btn btn-primary px-0 py-0">{{query[1]}}  </button>  <button type="button" class="btn btn-warning px-0 py-0"> {{query.property_type}}</button>
+				<p class="card-text">{{query[3]}}</p>
+			</div>
+	
+			</div>
+			<div class="card-footer">
+				
+			</div>
+		</div>
+</div>
+{% endblock %}

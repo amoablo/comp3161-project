@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from .forms import LoginForm
 import os
 from flask.helpers import send_from_directory
+import pymysql
 
 @app.route('/')
 def home():
@@ -17,6 +18,41 @@ def recipes():
     """Render website's recipes page."""
     images = get_uploaded_images()
     return render_template('recipes.html',recipes=images)
+
+@app.route('/myRecipes/<Recipeid>')
+def getRecipe(recipeid):
+    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    cur=con.cursor()
+    cur.execute("select * from recipe where id=Recipeid")
+    query = list(cur.fetchall())
+    print(query)
+    cur.close()
+    con.close()
+    if query  is None:
+        return redirect(url_for('home'))
+    return render_template("recipie_view.html", query=query)
+
+
+@app.route('/myRecipes')
+#@login_required
+def myRecipes():
+    """Render website's Personal Recipes Uploaded, My Recipes page."""
+    #connect to the db
+    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    #cursor (two cursor server side and client side)
+    cur=con.cursor()
+    #execute
+    cur.execute("select * from recipe")
+    # returns array of tuples
+    #rows=cur.fetchall()
+    recipieList = list(cur.fetchall())
+    print(recipieList)
+    #for r in rows:
+     #   print(f"Name:{r[1]}  Date: {r[2]}")
+    cur.close()
+    #close the connection
+    con.close()
+    return render_template('myRecipes.html',lst = recipieList)
 
 @app.route('/mealPlan')
 @login_required
