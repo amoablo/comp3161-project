@@ -60,6 +60,7 @@ create table recipe(
     recipe_id int not null unique auto_increment,
     name varchar(255),
     created_date date,
+    calorie int,
     primary key(recipe_id)
 );
 
@@ -146,6 +147,13 @@ create table measured_in(
     foreign key(measurement_id) references measurement(measurement_id) on delete cascade
 );
 
+create table creates(
+    user_id int not null,
+    recipe_id int not null, 
+    foreign key(user_id) references users(user_id) on delete cascade,
+    foreign key(recipe_id) references recipe(recipe_id) on delete cascade
+);
+
 -- Stored Procedures
 DELIMITER //
 
@@ -158,7 +166,9 @@ DELIMITER //
 
 DELIMITER ;
 
--- Insertions
+-- =========================
+--       Insertions
+-- =========================
 
 """
 
@@ -186,6 +196,7 @@ fake_data = {
     "recipe":{
         "name":[],
         "date":[],
+        "calorie":[]
     },
     "instruction":{
         "step_no":[],
@@ -236,6 +247,10 @@ fake_data = {
     "measured_in":{
         "ingredient_id":[],
         "measurement_id":[]
+    },
+    "creates":{
+        "user_id":[],
+        "recipe_id":[]
     }
 
 }
@@ -244,12 +259,13 @@ fake_data = {
 
 # num_fake_users = 200000
 # num_fake_recipes = 600000
-num_fake_users = 2
-num_fake_recipes = 6
+num_fake_users = 20
+num_fake_recipes = 30
 num_ingredients = 20
 max_num_recipe_ingredient = 8 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
 max_instructions_steps = 7
+max_calorie = 2000
 
 
 
@@ -286,6 +302,7 @@ for _ in range(num_fake_users):
 for _ in range(num_fake_recipes):
     fake_data["recipe"]["name"].append( fake.text(max_nb_chars=50 ))
     fake_data["recipe"]["date"].append( fake.date_between(start_date='-5y') )
+    fake_data["recipe"]["calorie"].append( random.randint(1, max_calorie) )
 
 
 
@@ -345,7 +362,42 @@ for r_id in range(len(fake_data["recipe"]["name"])):
         fake_data["instruction"]["description"].append(fake.text(max_nb_chars=50 ))
         inst_id+=1
 
-# insert the data into the sql
+
+
+# ===========================
+#   populate creates table 
+#============================
+
+# give each user a random set of recipes that they made
+
+num_fake_recipes_remain = num_fake_recipes
+user_recipes = 0 # the number of recipes the user creates
+num_user_remain = 0
+recipe_count = 0
+
+for u_id in range(len(fake_data["user"]["fname"])):
+    num_user_remain = len(fake_data["user"]["fname"]) - u_id
+
+    if num_user_remain == 1:
+        user_recipes = num_fake_recipes_remain + recipe_count
+    else:
+        division = num_fake_recipes_remain // num_user_remain
+        user_recipes = random.randint(1, division) + recipe_count
+        num_fake_recipes_remain -= (user_recipes - recipe_count)
+
+    #assign recipes to user
+    loop_cnt = recipe_count
+    for r_id in range(loop_cnt, user_recipes):
+        fake_data["creates"]["user_id"].append(u_id+1)
+        fake_data["creates"]["recipe_id"].append(r_id+1)
+        recipe_count += 1
+
+    
+
+
+# ---------------------------------------
+#      insert the data into the sql
+#---------------------------------------
 
 # insert users
 
@@ -374,10 +426,11 @@ meal_planner_fake_sql += """
 """
 
 for indx in range(len(fake_data["recipe"]["name"])):
-    insert_command = """insert into recipe (name, created_date) values ( '{}', '{}');
+    insert_command = """insert into recipe (name, created_date, calorie) values ( '{}', '{}', '{}');
 """.format(
         fake_data["recipe"]["name"][indx],
-        fake_data["recipe"]["date"][indx]
+        fake_data["recipe"]["date"][indx],
+        fake_data["recipe"]["calorie"][indx]
     )
     meal_planner_fake_sql+= insert_command
 
@@ -448,22 +501,6 @@ for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
     )
     meal_planner_fake_sql+= insert_command
 
-# insert measured in
-
-# meal_planner_fake_sql += """
-# -- Insert measured in data
-
-# """
-
-# for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
-#     insert_command = """insert into measured_in (ingredient_id, measurement_id)values ( (select ingredient_id from ingredients where ingredient_id = {}), (select measurement_id from measurement where measurement_id = {}));
-# """.format(
-#         fake_data["measured_in"]["ingredient_id"][indx],
-#         fake_data["measured_in"]["measurement_id"][indx]
-#     )
-#     meal_planner_fake_sql+= insert_command
-
-
 
 # insert made of
 
@@ -496,6 +533,21 @@ for indx in range(len(fake_data["prepare"]["recipe_id"])):
         fake_data["prepare"]["recipe_id"][indx],
         fake_data["prepare"]["instruction_id"][indx],
         fake_data["prepare"]["step_no"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+# insert creates
+
+meal_planner_fake_sql += """
+-- Insert created data
+
+"""
+
+for indx in range(len(fake_data["creates"]["user_id"])):
+    insert_command = """insert into creates (user_id, recipe_id) values ( '{}', '{}');
+""".format(
+        fake_data["creates"]["user_id"][indx],
+        fake_data["creates"]["recipe_id"][indx],
     )
     meal_planner_fake_sql+= insert_command
 
