@@ -24,11 +24,11 @@ def mealPlan():
     """Render website's meal plan page."""
     return render_template('mealplan.html')
 
-@app.route('/kitchen')
+@app.route('/pantry')
 @login_required
-def kitchen():
-    """Render website's kitchen page."""
-    return render_template('kitchen.html')
+def pantry():
+    """Render website's pantry page."""
+    return render_template('pantry.html')
 
 @app.route('/shoppingList')
 @login_required

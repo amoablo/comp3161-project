@@ -244,12 +244,12 @@ fake_data = {
 
 # num_fake_users = 200000
 # num_fake_recipes = 600000
-num_fake_users = 200000
-num_fake_recipes = 600000
-num_ingredients = 20
+num_fake_users = 2
+num_fake_recipes = 6
+num_ingredients = 10
 max_num_recipe_ingredient = 8 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
-max_instructions_steps = 8
+max_instructions_steps = 7
 
 
 
