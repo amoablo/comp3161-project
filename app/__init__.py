@@ -18,7 +18,7 @@ app.config['SECRET_KEY'] = "GqAExVdKcc66GNtuceYYSUSkJ3bhsULZhQZtT2xDrrAtz6KG4M6X
 hostname = 'localhost'
 username = 'comp3161-project2'
 password = 'comp3161-project2'
-database = 'comp3161-project2'
+database = 'comp3161-project2-mealplanner'
 
 # Connect to mysql database
 db = mysql.connect(host= hostname, 
