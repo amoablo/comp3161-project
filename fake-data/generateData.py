@@ -56,7 +56,6 @@ create table meal(
     meal_id int not null unique auto_increment,
     calorie int,
     num_servings int(6),
-    image_url text,
     primary key(meal_id)
 );
 
@@ -107,26 +106,28 @@ create table stores(
 create table schedule(
     user_id int not null,
     mealplan_id int not null,
-    schedule_date date,
     foreign key(user_id) references users(user_id) on delete cascade,
     foreign key(mealplan_id) references meal_plan(mealplan_id) on delete cascade
 );
 
 create table breakfast(
     meal_id int not null,
-    breakfast_date date,
+    mealplan_id int not null,
+    foreign key(mealplan_id) references meal_plan(mealplan_id) on delete cascade,
     foreign key(meal_id) references meal(meal_id) on delete cascade
 );
 
 create table lunch(
     meal_id int not null,
-    lunch_date date,
+    mealplan_id int not null,
+    foreign key(mealplan_id) references meal_plan(mealplan_id) on delete cascade,
     foreign key(meal_id) references meal(meal_id) on delete cascade
 );
 
 create table dinner(
     meal_id int not null,
-    dinner_date date,
+    mealplan_id int not null,
+    foreign key(mealplan_id) references meal_plan(mealplan_id) on delete cascade,
     foreign key(meal_id) references meal(meal_id) on delete cascade
 );
 
