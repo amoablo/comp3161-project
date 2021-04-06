@@ -14,26 +14,24 @@
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <th scope="row">Rice</th>
-            <td>10 lbs</td>
-          </tr>
-          <tr>
-            <th scope="row">Egg</th>
-            <td>6</td>
-          </tr>
-          <tr>
-            <th scope="row">Milk</th>
-            <td>1 gallon</td>
-          </tr>
-          <tr>
-            <th scope="row">Oil</th>
-            <td>1 litre</td>
-          </tr>
-          
+          {% for ingredient in ingredients%}
+            <tr>
+              <th scope="row">{{ ingredient['name'] }}</th>
+              {% if ingredient['quantity'] > 1 %}
+                <td>
+                  {{ ingredient['quantity'] }} 
+                  {{ ingredient['unit'] }}s <!-- add an 's' to quantities > 1 -->
+                </td>
+              {% else %}
+                <td>
+                  {{ ingredient['quantity']}} 
+                  {{ ingredient['unit'] }}
+                </td>
+              {% endif %}
+            </tr>
+          {% endfor %}
         </tbody>
     </table>
-      
 </div>
 
 {%endblock%}
