@@ -34,8 +34,9 @@ def mealPlan():
             cursor.execute(sql, (user_id,))
             result = cursor.fetchall()
             calories = form.calories.data
-            for recipe in result:
-                pass
+            not_found = True
+            # while not_found:
+            #     random.randrange(1, length(result))
             return render_template('mealplan.html', plan=result)
         sql = "SELECT * FROM recipes;"
         sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
