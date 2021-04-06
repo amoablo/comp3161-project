@@ -2,6 +2,45 @@ from faker import Faker
 from faker.providers import BaseProvider
 import random
 
+# Fake data Configuration Variables
+
+sql_filename = "meal_planer_fake_data.sql"
+
+# num_fake_users = 200000
+# num_fake_recipes = 600000
+
+num_fake_users = 10
+num_fake_recipes = 20 
+num_ingredients = 20
+max_num_recipe_ingredient = 10 #this needs to be less than or equal to the num_ingredients
+max_ingredient_amount = 10
+# max_ingredient_quantity = 5
+max_instructions_steps = 10
+max_calorie = 2000
+
+# extra generation variable
+max_num_stored_ingredient = 15 #this needs to be less than or equal to the num_ingredients
+max_ingredient_stored = 15 # the maximum ingredients stored, for better results make it more than max ingredient amount
+max_num_serving = 10
+max_week_num = 3
+
+images = ["recipes/test.png","recipes/test2.png"]
+measurements_data = ["count","gallon","lb","litre","kg","teaspoon", "tablespoon", "cup","quart", "pound"]
+
+
+fake = Faker(['en-US', 'en_US', 'en_US', 'en-US'])
+Faker.seed(87)
+
+# create new provider classs
+class userProvider(BaseProvider):
+    def gender(self):
+        return random.choice(["M","F","O"])
+
+class recipeProvider(BaseProvider):
+    def image_url(self):
+        return random.choice(images)
+    
+fake.add_provider(userProvider)
 
 
 # Create the tables in the sql file
@@ -13,8 +52,8 @@ meal_planner_fake_sql = """-- Meal Planner Fake Data and tables
    due to referential integrity constraints
  */
 
-create database mealplanner;
-use mealplanner;
+create database comp3161_project2_mealplanner;
+use comp3161_project2_mealplanner;
 
 drop table IF EXISTS users cascade;
 drop table IF EXISTS meal_plan cascade;
@@ -161,16 +200,42 @@ create table creates(
 );
 
 -- Stored Procedures
+
 DELIMITER //
 
 -- Procedures go here 
 
--- CREATE PROCEDURE Testi()
--- BEGIN
--- 	SELECT *  FROM products;
--- END //
+CREATE PROCEDURE getingredients(IN RID int)          
+BEGIN          
+SELECT ingredients.ingredient_id, ingredients.name, ingr_unit.unit, ingr_quan.amount
+    FROM (((SELECT made_of.ingredient_id, made_of.amount
+            FROM made_of
+            WHERE made_of.recipe_id = RID) ingr_quan
+    LEFT JOIN ingredients
+    ON ingr_quan.ingredient_id = ingredients.ingredient_id)
+
+    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
+                FROM measured_in
+                LEFT JOIN measurement
+                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
+    on ingr_quan.ingredient_id = ingr_unit.ingredient_id);
+END //
+
+CREATE PROCEDURE getingredient(IN I_ID int)          
+BEGIN          
+SELECT ingred.ingredient_id, ingred.name, ingr_unit.unit
+    FROM ((Select * from ingredients
+        WHERE ingredients.ingredient_id = I_ID) ingred
+
+    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
+                FROM measured_in
+                LEFT JOIN measurement
+                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
+    on ingred.ingredient_id = ingr_unit.ingredient_id);
+END //
 
 DELIMITER ;
+
 
 -- =========================
 --       Insertions
@@ -178,10 +243,12 @@ DELIMITER ;
 
 """
 
+
+
 # Generate the fake data 
 
 
-# data dictionary
+# fake data dictionary
 fake_data = {
     "user":{
         "fname":[],
@@ -232,15 +299,18 @@ fake_data = {
     },
     "breakfast":{
         "date":[],
-        "meal_id":[]
+        "meal_id":[],
+        "mealplan_id":[]
     },
     "lunch":{
         "date":[],
-        "meal_id":[]
+        "meal_id":[],
+        "mealplan_id":[]
     },
     "dinner":{
         "date":[],
-        "meal_id":[]
+        "meal_id":[],
+        "mealplan_id":[]
     },
     "made_from":{
         "meal_id":[],
@@ -262,43 +332,10 @@ fake_data = {
 
 }
 
-# Fake data Configuration Variables
-
-# num_fake_users = 200000
-# num_fake_recipes = 600000
-
-num_fake_users = 5
-num_fake_recipes = 10
-num_ingredients = 20
-max_num_recipe_ingredient = 8 #this needs to be less than or equal to the num_ingredients
-max_ingredient_amount = 10
-max_ingredient_quantity = 10
-max_instructions_steps = 7
-max_calorie = 2000
-
-images = ["recipes/test.png","recipes/test2.png"]
-
-
-
-
-fake = Faker(['en-US', 'en_US', 'en_US', 'en-US'])
-Faker.seed(129)
 
 # ===========================
 #   populate user table 
 #============================
-
-
-# create new provider classs
-class userProvider(BaseProvider):
-    def gender(self):
-        return random.choice(["M","F","O"])
-
-class recipeProvider(BaseProvider):
-    def image_url(self):
-        return random.choice(images)
-    
-fake.add_provider(userProvider)
 
 for _ in range(num_fake_users):
     fake_data["user"]["fname"].append( fake.first_name() )
@@ -334,7 +371,7 @@ for _ in range(num_ingredients):
 #   populate measurement table 
 #============================
 
-fake_data["measurement"]["unit"] = ["count","gallon","lb","litre","kg","teaspoon", "tablespoon", "cup","quart", "pound"]
+fake_data["measurement"]["unit"] = measurements_data
 
 
 
@@ -352,11 +389,11 @@ for i_id in range(len(fake_data["ingredient"]["name"])):
 #============================
 
 for u_id in range(len(fake_data["user"]["email"])):
-    ingredients_id = random.sample(range(num_ingredients), max_num_recipe_ingredient)
+    ingredients_id = random.sample(range(num_ingredients), max_num_stored_ingredient)
     for i_id in ingredients_id:
         fake_data["stores"]["user_id"].append(u_id+1)
         fake_data["stores"]["ingredient_id"].append(i_id+1)
-        fake_data["stores"]["quantity"].append(random.randint(1, max_ingredient_quantity-1))
+        fake_data["stores"]["quantity"].append(random.randint(1, max_ingredient_stored-1))
 
 
 # ===========================
@@ -419,7 +456,64 @@ for u_id in range(len(fake_data["user"]["fname"])):
         fake_data["creates"]["recipe_id"].append(r_id+1)
         recipe_count += 1
 
-    
+
+# -----------------
+#     EXTRAS
+# -----------------
+
+
+# ===========================
+#   populate meal table 
+#============================
+for r_id in range(len(fake_data["recipe"]["name"])):
+    fake_data["meal"]["calorie"].append( random.randint(1, max_calorie) )
+    fake_data["meal"]["num_servings"].append( random.randint(1, max_num_serving) )
+
+
+# ===========================
+#   populate mealplan table 
+#============================
+for m_id in range(len(fake_data["meal"]["calorie"])):
+    fake_data["meal_plan"]["date"].append( fake.date_between(start_date='-5y') )
+    fake_data["meal_plan"]["week_num"].append( random.randint(1, max_week_num) )
+
+
+
+# ===========================
+#   populate breakfast, lunch and dinnertable 
+#============================
+
+num_breakfast = len(fake_data["meal"]["calorie"])//3
+
+#breakfast 
+for mp_m_id in range(num_breakfast):
+    fake_data["breakfast"]["meal_id"].append(mp_m_id+1)
+    fake_data["breakfast"]["mealplan_id"].append(mp_m_id+1)
+
+num_lunch = num_breakfast*2
+
+#lunch 
+for mp_m_id in range(num_breakfast, num_lunch):
+    fake_data["lunch"]["meal_id"].append(mp_m_id+1)
+    fake_data["lunch"]["mealplan_id"].append(mp_m_id+1)
+
+num_dinner = num_breakfast*3 + (len(fake_data["meal"]["calorie"])%3)
+
+#dinner 
+for mp_m_id in range(num_lunch, num_dinner):
+    fake_data["dinner"]["meal_id"].append(mp_m_id+1)
+    fake_data["dinner"]["mealplan_id"].append(mp_m_id+1)
+
+
+
+# ===========================
+#   populate schedule table 
+#============================
+
+for mp_id in range(len(fake_data["meal_plan"]["week_num"])):
+    fake_data["schedule"]["user_id"].append(random.randint(1, num_fake_users))  
+    fake_data["schedule"]["mealplan_id"].append(mp_id+1)
+
 
 
 # ---------------------------------------
@@ -598,9 +692,112 @@ for indx in range(len(fake_data["creates"]["user_id"])):
     meal_planner_fake_sql+= insert_command
 
 
+# -----------------
+#     EXTRAS
+# -----------------
 
+
+
+# insert meal
+
+meal_planner_fake_sql += """
+-- Insert meal data
+
+"""
+
+for indx in range(len(fake_data["meal"]["calorie"])):
+    insert_command = """insert into meal (calorie, num_servings) values ( '{}', '{}');
+""".format(
+        fake_data["meal"]["calorie"][indx],
+        fake_data["meal"]["num_servings"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+# insert mealplan
+
+meal_planner_fake_sql += """
+-- Insert mealplan data
+
+"""
+
+for indx in range(len(fake_data["meal_plan"]["week_num"])):
+    insert_command = """insert into meal_plan (meal_date, week_num) values ( '{}', '{}');
+""".format(
+        fake_data["meal_plan"]["date"][indx],
+        fake_data["meal_plan"]["week_num"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+# insert breakfast
+
+meal_planner_fake_sql += """
+-- Insert breakfast data
+
+"""
+
+for indx in range(len(fake_data["breakfast"]["meal_id"])):
+    insert_command = """insert into breakfast (meal_id, mealplan_id) values ( '{}', '{}');
+""".format(
+        fake_data["breakfast"]["meal_id"][indx],
+        fake_data["breakfast"]["mealplan_id"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert lunch
+
+meal_planner_fake_sql += """
+-- Insert lunch data
+
+"""
+
+for indx in range(len(fake_data["lunch"]["meal_id"])):
+    insert_command = """insert into lunch (meal_id, mealplan_id) values ( '{}', '{}');
+""".format(
+        fake_data["lunch"]["meal_id"][indx],
+        fake_data["lunch"]["mealplan_id"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert dinner
+
+meal_planner_fake_sql += """
+-- Insert dinner data
+
+"""
+
+for indx in range(len(fake_data["dinner"]["meal_id"])):
+    insert_command = """insert into dinner (meal_id, mealplan_id) values ( '{}', '{}');
+""".format(
+        fake_data["dinner"]["meal_id"][indx],
+        fake_data["dinner"]["mealplan_id"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
+# insert schedule
+
+meal_planner_fake_sql += """
+-- Insert schedule data
+
+"""
+
+for indx in range(len(fake_data["schedule"]["user_id"])):
+    insert_command = """insert into schedule (user_id, mealplan_id) values ( '{}', '{}');
+""".format(
+        fake_data["schedule"]["user_id"][indx],
+        fake_data["schedule"]["mealplan_id"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+ 
 # Write the string to the sql file 
-text_file = open("meal_planner.sql", "w")
+text_file = open(sql_filename, "w")
 text_file.write(meal_planner_fake_sql)
 text_file.close()
 
