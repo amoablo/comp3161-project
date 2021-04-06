@@ -109,7 +109,9 @@ def mealPlan():
             while day <= 7:
                 days[day] = find_days(recipes, threshold)
             print(days)
-            return render_template('mealplan.html', plan=result)
+            cursor.close()
+            connection.close()
+            return render_template('mealplan.html', plan=days, form=form)
         # else
         sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE breakfast_date IN (SELECT meal_date FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))))"
         cursor.execute(sql, (current_user.get_id()))
@@ -121,8 +123,9 @@ def mealPlan():
         cursor.execute(sql, (current_user.get_id()))
         dinner = cursor.fetchall() 
         cursor.close()
-        return render_template('mealplan.html', b=breakfast, l=lunch, d=dinner)
-    connection.close()
+        connection.close()
+        return render_template('mealplan.html', b=breakfast, l=lunch, d=dinner, form=form)
+    flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
 @app.route('/pantry')
