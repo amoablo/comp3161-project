@@ -79,7 +79,7 @@ def myRecipes():
     #for r in rows:
      #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
-    #close the connection
+    #close the connnection
     con.close()
     return render_template('myRecipes.html',lst = recipieList)
 
@@ -115,7 +115,25 @@ def mealPlan():
 # @login_required
 def pantry():
     """Render website's pantry page."""
-    return render_template('pantry.html')
+    conn = pymysql.connect(host='localhost',
+                             user='root',
+                             password='',
+                             database='meal_planner',
+                             cursorclass=pymysql.cursors.DictCursor)
+    #conn = pymysql.connect(host= "localhost",database="meal_planner",user="root",password="",)
+    with conn:
+        with conn.cursor() as cursor:
+            # Read a single record
+            sql_query = "select quantity, name, unit from users as u \
+                join stores as s on u.user_id=s.user_id \
+                    join ingredients as i on s.ingredient_id=i.ingredient_id \
+                        join measured_in as mi on i.ingredient_id=mi.ingredient_id \
+                            join measurement as m on mi.measurement_id=m.measurement_id"
+            cursor.execute(sql_query)
+            result = (cursor.fetchall())
+            if result is None:
+                return redirect(url_for('home'))
+    return render_template('pantry.html', ingredients=result)
 
 @app.route('/shoppingList')
 #@login_required
