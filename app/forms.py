@@ -6,7 +6,13 @@ from flask_wtf.file import FileField, FileRequired, FileAllowed
 class LoginForm(FlaskForm):
     email = StringField('Email', validators=[InputRequired()])
     password = PasswordField('Password', validators=[InputRequired()])
-
+    
+class SignUpForm(FlaskForm):
+    firstname=StringField('Firstname', validators=[InputRequired()])
+    lastname=StringField('Lastname', validators=[InputRequired()])
+    email = StringField("Email",  validators=[DataRequired(), Email()])
+    password = PasswordField('Password', validators=[InputRequired()])
+    
 class MealPlanForm(FlaskForm):
     calories = IntegerField("Calories", validators=[DataRequired()], description="Number of calories\
          for the week")

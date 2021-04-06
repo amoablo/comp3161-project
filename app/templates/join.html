@@ -1,31 +1,48 @@
-{% extends "base.html" %}
+{% extends "base.html" %} {% block main %}
 
-{% block main %}
-  
 <div class="login-page d-flex flex-column ">
-  <div class="login-form-header d-flex justify-content-center">
-    <h2 id='login-page-text'>Meal Planner</h2>
-  </div>
-  {% include 'flash_messages.html' %}
-  <form action="{{ url_for('login') }}" method="post" class="login-form rounded">
-    {{ form.csrf_token }}
-    
-    <h4 class='form-header'>Join</h4>
-    <div class="form-group">
-      {{ form.email.label }}
-      {{ form.email(class='form-control', placeholder="email") }}
+    <div class="login-form-header d-flex justify-content-center">
+        <h2 id='login-page-text'>JOIN</h2>
     </div>
-    <div class="form-group">
-      {{ form.password.label }}
-      {{ form.password(class='form-control', placeholder="password") }}
+    {% include 'flash_messages.html' %}
+    <form action="{{ url_for('join') }}" method="post" class="login-form rounded">
+        {{ form.csrf_token }}
+
+        <h4 class='form-header'>Join</h4>
+        <div class="form-group">
+            {{ form.firstname.label }} {{ form.firstname(class='form-control', placeholder="firstname") }}
+        </div>
+        <div class="form-group">
+            {{ form.lastname.label }} {{ form.lastname(class='form-control', placeholder="lastname") }}
+        </div>
+        <div class="form-group">
+            {{ form.email.label }} {{ form.email(class='form-control', placeholder="email") }}
+        </div>
+        <div class="form-group gender-group">
+            <label for="gender-group" class="d-block">Gender</label>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="genderOptions" id="inlineRadio1" value="M">
+                <label class="form-check-label" for="inlineRadio1">Male</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="genderOptions" id="inlineRadio2" value="F">
+                <label class="form-check-label" for="inlineRadio2">Female</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="genderOptions" id="inlineRadio3" value="O">
+                <label class="form-check-label" for="inlineRadio2">Other</label>
+            </div>
+        </div>
+        <div class="form-group">
+            {{ form.password.label }} {{ form.password(class='form-control', placeholder="password") }}
+        </div>
+        <div class="submit-btn-container d-flex justify-content-center">
+            <button type="submit" name="submit" class="btn custom-btn submit-btn">Join</button>
+        </div>
+    </form>
+    <div class="login-page-footer d-flex justify-content-center mt-4 gap-3">
+        <span class='no-account-text mt-2'>Already have an account?</span>
+        <a class="btn join-btn2 custom-btn" href="#" role="button">Sign In</a>
     </div>
-    <div class="submit-btn-container d-flex justify-content-center">
-      <button type="submit" name="submit" class="btn custom-btn submit-btn">Join</button>
-    </div>
-  </form>
-  <div class="login-page-footer d-flex justify-content-center mt-4 gap-3">
-    <span class='no-account-text mt-2'>Already have an account?</span>
-    <a class="btn join-btn2 custom-btn" href="#" role="button">Sign In</a>
-  </div>
 </div>
 {% endblock %}

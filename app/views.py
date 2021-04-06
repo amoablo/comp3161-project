@@ -3,11 +3,12 @@ from flask import render_template, request, redirect, url_for, flash, Markup
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from .forms import LoginForm, MealPlanForm
-import os, random
+from .forms import LoginForm,SignUpForm,MealPlanForm
+import os
 from flask.helpers import send_from_directory
-import pymysql
 from app.models import User
+import pymysql
+
 
 @app.route('/')
 def home():
@@ -19,7 +20,7 @@ def recipes():
     """Render website's recipes page."""
     #images = get_uploaded_images()
     #connect to the db
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     #cursor (two cursor server side and client side)
     cur=con.cursor()
     #execute
@@ -27,7 +28,7 @@ def recipes():
     # returns array of tuples
     #rows=cur.fetchall()
     recipieList = list(cur.fetchall())
-    print(recipieList)
+    # print(recipieList)
     #for r in rows:
      #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
@@ -37,7 +38,7 @@ def recipes():
 
 @app.route('/myRecipes/<recipieid>')
 def getRecipe(recipieid):
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     cur=con.cursor()
     stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
     ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
@@ -64,7 +65,7 @@ def getRecipe(recipieid):
 def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
     #connect to the db
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     #cursor (two cursor server side and client side)
     cur=con.cursor()
     #execute
@@ -72,11 +73,11 @@ def myRecipes():
     # returns array of tuples
     #rows=cur.fetchall()
     recipieList = list(cur.fetchall())
-    print(recipieList)
+    # print(recipieList)
     #for r in rows:
      #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
-    #close the connection
+    #close the connnection
     con.close()
     return render_template('myRecipes.html',lst = recipieList)
 
@@ -96,7 +97,7 @@ def mealPlan():
             result = cursor.fetchall()
             calories = form.calories.data
             not_found = True
-            print(result)
+            # print(result)
             # while not_found:
             #     random.randrange(1, length(result))
             return render_template('mealplan.html', plan=result)
@@ -112,11 +113,24 @@ def mealPlan():
 # @login_required
 def pantry():
     """Render website's pantry page."""
-    return render_template('pantry.html')
+    conn = db_connect()
+    with conn:
+        with conn.cursor() as cursor:
+            sql_query = "select quantity, name, unit from users as u \
+                join stores as s on u.user_id=s.user_id \
+                    join ingredients as i on s.ingredient_id=i.ingredient_id \
+                        join measured_in as mi on i.ingredient_id=mi.ingredient_id \
+                            join measurement as m on mi.measurement_id=m.measurement_id"
+            cursor.execute(sql_query)
+            result = (cursor.fetchall())
+            if result is None:
+                return redirect(url_for('home'))
+    return render_template('pantry.html', ingredients=result)
 
 @app.route('/shoppingList')
-@login_required
+#@login_required
 def shoppingList():
+    
     """Render website's shopping list page."""
     return render_template('shoppinglist.html')
 
@@ -157,25 +171,40 @@ def login():
 @app.route("/join", methods=["GET", "POST"])
 def join():
     if current_user.is_authenticated:
-        return redirect(url_for('recipes'))
-    form = LoginForm()
+        return redirect(url_for('recipe'))
+    form = SignUpForm()
+
     if request.method == "POST":
         if form.validate_on_submit():
             # Get the username and password values from the form.
-            email = form.username.data
+            firstname=form.firstname.data
+            lastname=form.lastname.data
+            gender = request.form['genderOptions']
+            email = form.email.data
             password = form.password.data
-
+            
+            con = db_connect()
+            cur=con.cursor()
+            sql="INSERT INTO users(first_name,last_name,email,gender,password) VALUES(%s,%s,%s,%s,%s)"
+            cur.execute(sql,(firstname,lastname,email,gender,password))
+            con.commit()
+            cur.close()
+            con.close()
+            flash('Joined successfully.', 'success')
+            return redirect(url_for("login"))
+        else:
+            flash('Information invalid.', 'danger')
             # query database for a user based on the username
 
-            user = ''
+            # user = ''
 
-            # validate the password and ensure that a user was found
-            if user is not None and check_password_hash(user.password, password):
-                login_user(user)    # load into session
-                flash('Joined successfully.', 'success') # flash a message to the user
-                return redirect(url_for("recipes"))  # redirect to a secure-page route
-            else:
-                flash('Username or Password is incorrect.', 'danger')
+            # # validate the password and ensure that a user was found
+            # if user is not None and check_password_hash(user.password, password):
+            #     login_user(user)    # load into session
+            #     flash('Joined successfully.', 'success') # flash a message to the user
+            #     return redirect(url_for("recipes"))  # redirect to a secure-page route
+            # else:
+            #     flash('Username or Password is incorrect.', 'danger')
     flash_errors(form)
     return render_template("join.html", form=form)
 
@@ -203,15 +232,14 @@ def load_user(user_id):
                 return User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
     return None
 
-# Connect to the database
 def db_connect():
+    '''Connects to mysql database using environment variables'''
     return pymysql.connect(host=app.config['DATABASE_HOST'],
                              user=app.config['DATABASE_USER'],
                              password=app.config['DATABASE_PASSWORD'],
                              database=app.config['DATABASE_NAME'],
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
-
 
 @app.route('/recipes/<filename>')
 def getImage(filename):
