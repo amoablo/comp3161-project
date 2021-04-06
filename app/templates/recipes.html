@@ -16,13 +16,17 @@
 </div>
 
 <ul class="recipes row row-cols-1 row-cols-md-4 g-4">
-    {% for recipe in recipes %}
+    {% for p in recipes %}
     <li class="recipe">
         <div class="col">
-            <a href="{{ url_for('getImage', filename=recipe) }}" class='card'>
-                <img src="{{ url_for('getImage', filename=recipe) }}" class="card-img-top" alt="Recipe image">
+            <!--<a href="{{ url_for('getImage', filename=recipe) }}" class='card'>
+                <img src="{{ url_for('getImage', filename=recipe) }}" class="card-img-top" alt="Recipe image">-->
                 <div class="card-body">
-                    <p>Placeat culpa quibusdam quibusdam non et commodi</p>
+                    <p>{{ p[1] }}</p>
+                    <p>{{ p[2] }}</p>
+                </div>
+                <div class="">
+                    <button><a class="btn btn-block specific-green" href="{{ url_for('getRecipe', recipieid= p[0]) }}">View Recipie</a></button>
                 </div>
             </a>
         </div>
