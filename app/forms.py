@@ -22,3 +22,7 @@ class RecipForm(FlaskForm):
     calories = IntegerField("Calories", validators=[DataRequired()], description="Number of calories for the meal that will be created from this recipe")
     number_of_steps = IntegerField("No. of Steps", validators=[DataRequired()], description="Number of steps for to prepare a meal from this recipe")
     step_description = TextAreaField('Description of Steps', validators=[DataRequired()])
+    image = FileField('Image of Meal', validators=[
+        FileRequired(),
+        FileAllowed(['jpg','png','jpeg'], 'Images only')
+    ])
