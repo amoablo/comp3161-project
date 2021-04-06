@@ -5,7 +5,7 @@ from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import LoginForm,SignUpForm,MealPlanForm
 from .databasemanager import *
-import os
+import os, random
 from flask.helpers import send_from_directory
 from app.models import *
 import pymysql
@@ -91,7 +91,7 @@ def mealPlan():
     connection = db_connect()
     if connection is not None:
         cursor = connection.cursor()
-        if request.method == "POST":
+        if request.method == "POST" and form.validate_on_submit():
             user_id = current_user.get_id()
             sql = "SELECT * FROM recipe WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
             cursor.execute(sql, (user_id,))
@@ -102,17 +102,18 @@ def mealPlan():
             days = {}
             day = 1
             threshold = calories // 7 # because there are 3 meals in a day
-            print(recipes)
             """
                 For each day, find meals that meet the weekly 
                 calories divided by 7.
             """
             while day <= 7:
                 days[day] = find_days(recipes, threshold)
-            print(days)
+                day += 1
+            #print(days)
+            get
             cursor.close()
             connection.close()
-            return render_template('mealplan.html', plan=days, form=form)
+            return redirect('/mealplan')
         # else
         sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE breakfast_date IN (SELECT meal_date FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))))"
         cursor.execute(sql, (current_user.get_id()))
@@ -125,7 +126,10 @@ def mealPlan():
         dinner = cursor.fetchall() 
         cursor.close()
         connection.close()
-        return render_template('mealplan.html', b=breakfast, l=lunch, d=dinner, form=form)
+        # collapse into one dictionary
+        length = len(breakfast) + len(lunch) +len(dinner)
+        plan = {"breakfast":breakfast, 'lunch':lunch, 'dinner':dinner}
+        return render_template('mealplan.html',length=length, plan=plan, form=form)
     flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
@@ -241,12 +245,12 @@ def logout():
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(id):
     connection = db_connect()
     with connection:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM users WHERE user_id = %s"
-            cursor.execute(sql, (user_id))
+            cursor.execute(sql, (id))
             user = cursor.fetchone()
             if user is not None:
                 return User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
@@ -266,15 +270,19 @@ def find_days(recipes, calories):
     total_calories = 0
     i = 0
     result = [[],[],[]]
-    while total_calories < calories:
+    while total_calories < calories and i < 10:
+        # print(result)
         seed = random.randrange(0, len(recipes))
-        if recipes[seed]["calorie"] <= calories:
-            total_calories += recipes[seed]["calorie"]
-            if result[i%3] is None:
+        if result[i%3] == []:
+            if total_calories + recipes[seed]["calorie"] <= calories:
+                total_calories += recipes[seed]["calorie"]
                 result[i%3].append(recipes[seed])
                 result[i%3].append(1)
-            else:
-               result[i%3][1] += 1 
+        elif total_calories + result[i%3][0]["calorie"] <= calories:
+            total_calories += result[i%3][0]["calorie"]
+            result[i%3][1] += 1 
+        else:
+            break
         i += 1
     return result
 
