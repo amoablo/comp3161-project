@@ -4,7 +4,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import LoginForm, MealPlanForm
-import os
+import os, random
 from flask.helpers import send_from_directory
 import pymysql
 from app.models import User
@@ -34,8 +34,8 @@ def mealPlan():
             cursor.execute(sql, (user_id,))
             result = cursor.fetchall()
             calories = form.calories.data
-            # for recipe in result:
-            #     pass
+            for recipe in result:
+                pass
             return render_template('mealplan.html', plan=result)
         sql = "SELECT * FROM recipes;"
         sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
