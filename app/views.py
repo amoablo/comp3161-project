@@ -1,12 +1,13 @@
 from app import app, db, login_manager
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, Markup
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from .forms import LoginForm
-import os
+from .forms import LoginForm, MealPlanForm
+import os, random
 from flask.helpers import send_from_directory
 import pymysql
+from app.models import User
 
 @app.route('/')
 def home():
@@ -64,11 +65,32 @@ def myRecipes():
     con.close()
     return render_template('myRecipes.html',lst = recipieList)
 
-@app.route('/mealPlan')
 @login_required
+@app.route('/mealPlan', methods=['GET','POST'])
+# @login_required
 def mealPlan():
     """Render website's meal plan page."""
-    return render_template('mealplan.html')
+    form = MealPlanForm()
+    connection = db_connect()
+    if connection is not None:
+        cursor = connection.cursor()
+        if request.method == "POST":
+            user_id = current_user.get_id()
+            sql = "SELECT * FROM recipes WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
+            cursor.execute(sql, (user_id,))
+            result = cursor.fetchall()
+            calories = form.calories.data
+            not_found = True
+            # while not_found:
+            #     random.randrange(1, length(result))
+            return render_template('mealplan.html', plan=result)
+        sql = "SELECT * FROM recipes;"
+        sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
+        cursor.execute(sql, ('webmaster@python.org', 'very-secret'))
+        result = cursor.fetchone()
+        cursor.close()
+    connection.close()
+    return redirect(url_for('login'))
 
 @app.route('/pantry')
 # @login_required
@@ -90,20 +112,29 @@ def login():
     if request.method == "POST":
         if form.validate_on_submit():
             # Get the username and password values from the form.
-            email = form.username.data
+            email = form.email.data
             password = form.password.data
 
             # query database for a user based on the username
-
-            user = ''
-
-            # validate the password and ensure that a user was found
-            if user is not None and check_password_hash(user.password, password):
-                login_user(user)    # load into session
-                flash('Logged in successfully.', 'success') # flash a message to the user
-                return redirect(url_for("recipes"))  # redirect to a secure-page route
+            connection = db_connect()
+            if connection is not None:
+                cursor = connection.cursor()
+                sql = "SELECT * FROM users WHERE email = %s and password = %s"
+                cursor.execute(sql, (email, password))
+                user = cursor.fetchone()
+                user = User(user["user_id"], user["first_name"], user["last_name"], user["email"],\
+                     user["password"])
+                # validate the password and ensure that a user was found
+                if user is not None and user.password == password:
+                    login_user(user)    # load into session
+                    flash('Logged in successfully.', 'success') # flash a message to the user
+                    return redirect(url_for(request.referrer))  # redirect to a secure-page route
+                else:
+                    flash('Username or Password is incorrect.', 'danger')
+                cursor.close()
             else:
-                flash('Username or Password is incorrect.', 'danger')
+                flash("Can't connect to database.","danger")
+            connection.close()
     flash_errors(form)
     return render_template("login.html", form=form)
 
@@ -147,7 +178,22 @@ def logout():
 # the user ID stored in the session
 @login_manager.user_loader
 def load_user(id):
-    return ''
+    connection = db_connect()
+    with connection:
+        with connection.cursor() as cursor:
+            sql = "SELECT * FROM users WHERE user_id = %s"
+            cursor.execute(sql, (Markup(id).striptags(),))
+            result = cursor.fetchone()
+    return result
+
+# Connect to the database
+def db_connect():
+    return pymysql.connect(host=app.config['DATABASE_HOST'],
+                             user=app.config['DATABASE_USER'],
+                             password=app.config['DATABASE_PASSWORD'],
+                             database=app.config['DATABASE_NAME'],
+                             charset='utf8mb4',
+                             cursorclass=pymysql.cursors.DictCursor)
 
 
 @app.route('/recipes/<filename>')
