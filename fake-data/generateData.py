@@ -12,6 +12,10 @@ meal_planner_fake_sql = """-- Meal Planner Fake Data and tables
    must drop tables with foreign keys first
    due to referential integrity constraints
  */
+
+create database mealplanner;
+use mealplanner;
+
 drop table IF EXISTS users cascade;
 drop table IF EXISTS meal_plan cascade;
 drop table IF EXISTS meal cascade;
@@ -261,16 +265,13 @@ fake_data = {
 
 # num_fake_users = 200000
 # num_fake_recipes = 600000
-<<<<<<< HEAD
-num_fake_users = 20
-num_fake_recipes = 30
-=======
-num_fake_users = 2
-num_fake_recipes = 6
->>>>>>> receipe
+
+num_fake_users = 5
+num_fake_recipes = 10
 num_ingredients = 20
 max_num_recipe_ingredient = 8 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
+max_ingredient_quantity = 10
 max_instructions_steps = 7
 max_calorie = 2000
 
@@ -332,7 +333,7 @@ for _ in range(num_ingredients):
 #   populate measurement table 
 #============================
 
-fake_data["measurement"]["unit"] = ["count","lb"]
+fake_data["measurement"]["unit"] = ["count","gallon","lb","litre","kg","teaspoon", "tablespoon", "cup","quart", "pound"]
 
 
 
@@ -344,6 +345,17 @@ for i_id in range(len(fake_data["ingredient"]["name"])):
     fake_data["measured_in"]["ingredient_id"].append(i_id+1)
     fake_data["measured_in"]["measurement_id"].append(random.randint(1,len(fake_data["measurement"]["unit"])))
 
+
+# ===========================
+#   populate stores table 
+#============================
+
+for u_id in range(len(fake_data["user"]["email"])):
+    ingredients_id = random.sample(range(num_ingredients), max_num_recipe_ingredient)
+    for i_id in ingredients_id:
+        fake_data["stores"]["user_id"].append(u_id+1)
+        fake_data["stores"]["ingredient_id"].append(i_id+1)
+        fake_data["stores"]["quantity"].append(random.randint(1, max_ingredient_quantity-1))
 
 
 # ===========================
@@ -517,6 +529,24 @@ for indx in range(len(fake_data["measured_in"]["ingredient_id"])):
     meal_planner_fake_sql+= insert_command
 
 
+# insert stores
+
+meal_planner_fake_sql += """
+-- Insert stores data
+
+"""
+
+for indx in range(len(fake_data["stores"]["user_id"])):
+    insert_command = """insert into stores (user_id, ingredient_id, quantity) values ( '{}', '{}','{}');
+""".format(
+        fake_data["stores"]["user_id"][indx],
+        fake_data["stores"]["ingredient_id"][indx],
+        fake_data["stores"]["quantity"][indx]
+    )
+    meal_planner_fake_sql+= insert_command
+
+
+
 # insert made of
 
 meal_planner_fake_sql += """
@@ -569,6 +599,9 @@ for indx in range(len(fake_data["creates"]["user_id"])):
 
 
 # Write the string to the sql file 
-text_file = open("meal_planer_fake_data.sql", "w")
+text_file = open("meal_planner.sql", "w")
 text_file.write(meal_planner_fake_sql)
 text_file.close()
+
+#select distinct recipe.name, ingredients.name from made_of Join recipe on recipe.recipe_id=made_of.recipe_id Join ingredients on ingredients.ingredient_id=made_of.ingredient_id where recipe.recipe_id=1;
+#select recipe.name from made_from join recipe on recipe.recipe_id=made_from.recipe_id;

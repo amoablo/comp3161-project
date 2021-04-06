@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block main %}
+  
+<div class="login-page d-flex flex-column ">
+  <div class="login-form-header d-flex justify-content-center">
+    <h2 id='login-page-text'>Add New Recipe</h2>
+  </div>
+  {% include 'flash_messages.html' %}
+  <form action="{{ url_for('login') }}" method="post" class="login-form rounded">
+    {{ form.csrf_token }}
+    
+    <h4 class='form-header'>Join</h4>
+    <div class="form-group">
+      {{ form.name.label }}
+      {{ form.name(class='form-control', placeholder="name") }}
+    </div>
+    <div class="form-group">
+      {{ form.calories.label }}
+      {{ form.calories(class='form-control', placeholder="calories") }}
+    </div>
+    <div class="form-group">
+        {{ form.number_of_steps.label }}
+        {{ form.number_of_steps(class='form-control', placeholder="ex. 10") }}
+      </div>
+      <div class="form-group">
+        {{ form.step_description.label }}
+        {{ form.step_description(class='form-control', placeholder="ex. beat eggs") }}
+      </div>
+    <div class="submit-btn-container d-flex justify-content-center">
+      <button type="submit" name="submit" class="btn custom-btn submit-btn">Submit</button>
+    </div>
+  </form>
+</div>
+{% endblock %}
