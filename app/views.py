@@ -74,22 +74,38 @@ def mealPlan():
     connection = db_connect()
     if connection is not None:
         cursor = connection.cursor()
-        if request.method == "GET":
+        if request.method == "POST":
             user_id = current_user.get_id()
             sql = "SELECT * FROM recipe WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
             cursor.execute(sql, (user_id,))
-            result = cursor.fetchall()
+            recipes = cursor.fetchall()
             calories = form.calories.data
             not_found = True
-            print(result)
-            # while not_found:
-            #     random.randrange(1, length(result))
+            total_calories = 0
+            days = {}
+            day = 1
+            threshold = calories // 7 # because there are 3 meals in a day
+            print(recipes)
+            """
+                For each day, find meals that meet the weekly 
+                calories divided by 7.
+            """
+            while day <= 7:
+                days[day] = find_days(recipes, threshold)
+            print(days)
             return render_template('mealplan.html', plan=result)
-        sql = "SELECT * FROM recipes;"
-        sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
-        cursor.execute(sql, ('webmaster@python.org', 'very-secret'))
-        result = cursor.fetchone()
+        # else
+        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE breakfast_date IN (SELECT meal_date FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))))"
+        cursor.execute(sql, (current_user.get_id()))
+        breakfast = cursor.fetchall()
+        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE lunch_date IN (SELECT meal_date FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))))"
+        cursor.execute(sql, (current_user.get_id()))
+        lunch = cursor.fetchall()
+        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE dinner_date IN (SELECT meal_date FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))))"
+        cursor.execute(sql, (current_user.get_id()))
+        dinner = cursor.fetchall() 
         cursor.close()
+        return render_template('mealplan.html', b=breakfast, l=lunch, d=dinner)
     connection.close()
     return redirect(url_for('login'))
 
@@ -197,6 +213,22 @@ def db_connect():
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
 
+def find_days(recipes, calories):
+    seed = random.randrange(0, len(recipes))
+    total_calories = 0
+    i = 0
+    result = [[],[],[]]
+    while total_calories < calories:
+        seed = random.randrange(0, len(recipes))
+        if recipes[seed]["calorie"] <= calories:
+            total_calories += recipes[seed]["calorie"]
+            if result[i%3] is None:
+                result[i%3].append(recipes[seed])
+                result[i%3].append(1)
+            else:
+               result[i%3][1] += 1 
+        i += 1
+    return result
 
 @app.route('/recipes/<filename>')
 def getImage(filename):
