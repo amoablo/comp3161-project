@@ -17,8 +17,23 @@ def home():
 @app.route('/recipes')
 def recipes():
     """Render website's recipes page."""
-    images = get_uploaded_images()
-    return render_template('recipes.html',recipes=images)
+    #images = get_uploaded_images()
+    #connect to the db
+    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    #cursor (two cursor server side and client side)
+    cur=con.cursor()
+    #execute
+    cur.execute("select * from recipe")
+    # returns array of tuples
+    #rows=cur.fetchall()
+    recipieList = list(cur.fetchall())
+    print(recipieList)
+    #for r in rows:
+     #   print(f"Name:{r[1]}  Date: {r[2]}")
+    cur.close()
+    #close the connection
+    con.close()
+    return render_template('recipes.html',recipes=recipieList)
 
 @app.route('/myRecipes/<recipieid>')
 def getRecipe(recipieid):
