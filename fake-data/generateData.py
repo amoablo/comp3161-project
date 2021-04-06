@@ -4,30 +4,32 @@ import random
 
 # Fake data Configuration Variables
 
+sql_filename = "meal_planer_fake_data.sql"
+
 # num_fake_users = 200000
 # num_fake_recipes = 600000
 
-num_fake_users = 2
-num_fake_recipes = 4 
-num_ingredients = 5
-max_num_recipe_ingredient = 2 #this needs to be less than or equal to the num_ingredients
-max_ingredient_amount = 2
-max_ingredient_quantity = 5
-max_instructions_steps = 2
+num_fake_users = 10
+num_fake_recipes = 20 
+num_ingredients = 20
+max_num_recipe_ingredient = 10 #this needs to be less than or equal to the num_ingredients
+max_ingredient_amount = 10
+# max_ingredient_quantity = 5
+max_instructions_steps = 10
 max_calorie = 2000
 
 # extra generation variable
-max_num_stored_ingredient = 2 #this needs to be less than or equal to the num_ingredients
-max_ingredient_stored = 4 # the maximum ingredients stored, for better results make it more than max ingredient amount
+max_num_stored_ingredient = 15 #this needs to be less than or equal to the num_ingredients
+max_ingredient_stored = 15 # the maximum ingredients stored, for better results make it more than max ingredient amount
 max_num_serving = 10
-max_week_num = 10
+max_week_num = 3
 
 images = ["recipes/test.png","recipes/test2.png"]
 measurements_data = ["count","gallon","lb","litre","kg","teaspoon", "tablespoon", "cup","quart", "pound"]
 
 
 fake = Faker(['en-US', 'en_US', 'en_US', 'en-US'])
-Faker.seed(129)
+Faker.seed(87)
 
 # create new provider classs
 class userProvider(BaseProvider):
@@ -769,7 +771,7 @@ for indx in range(len(fake_data["schedule"]["user_id"])):
 
  
 # Write the string to the sql file 
-text_file = open("meal_planer_fake_data.sql", "w")
+text_file = open(sql_filename, "w")
 text_file.write(meal_planner_fake_sql)
 text_file.close()
 
