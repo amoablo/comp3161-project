@@ -89,13 +89,14 @@ def mealPlan():
     connection = db_connect()
     if connection is not None:
         cursor = connection.cursor()
-        if request.method == "POST":
+        if request.method == "GET":
             user_id = current_user.get_id()
-            sql = "SELECT * FROM recipes WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
+            sql = "SELECT * FROM recipe WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
             cursor.execute(sql, (user_id,))
             result = cursor.fetchall()
             calories = form.calories.data
             not_found = True
+            print(result)
             # while not_found:
             #     random.randrange(1, length(result))
             return render_template('mealplan.html', plan=result)
@@ -122,7 +123,7 @@ def shoppingList():
 @app.route("/login", methods=["GET", "POST"])
 def login():
     if current_user.is_authenticated:
-        return redirect(url_for('recipe'))
+        return redirect(url_for('recipes'))
     form = LoginForm()
     if request.method == "POST":
         if form.validate_on_submit():
@@ -137,13 +138,12 @@ def login():
                 sql = "SELECT * FROM users WHERE email = %s and password = %s"
                 cursor.execute(sql, (email, password))
                 user = cursor.fetchone()
-                user = User(user["user_id"], user["first_name"], user["last_name"], user["email"],\
-                     user["password"])
                 # validate the password and ensure that a user was found
-                if user is not None and user.password == password:
+                if user is not None and user["password"] == password:
+                    user = User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
                     login_user(user)    # load into session
                     flash('Logged in successfully.', 'success') # flash a message to the user
-                    return redirect(url_for(request.referrer))  # redirect to a secure-page route
+                    return redirect(request.url)  # redirect to a secure-page route
                 else:
                     flash('Username or Password is incorrect.', 'danger')
                 cursor.close()
@@ -157,7 +157,7 @@ def login():
 @app.route("/join", methods=["GET", "POST"])
 def join():
     if current_user.is_authenticated:
-        return redirect(url_for('recipe'))
+        return redirect(url_for('recipes'))
     form = LoginForm()
     if request.method == "POST":
         if form.validate_on_submit():
@@ -192,14 +192,16 @@ def logout():
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
-def load_user(id):
+def load_user(user_id):
     connection = db_connect()
     with connection:
         with connection.cursor() as cursor:
             sql = "SELECT * FROM users WHERE user_id = %s"
-            cursor.execute(sql, (Markup(id).striptags(),))
-            result = cursor.fetchone()
-    return result
+            cursor.execute(sql, (user_id))
+            user = cursor.fetchone()
+            if user is not None:
+                return User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
+    return None
 
 # Connect to the database
 def db_connect():
