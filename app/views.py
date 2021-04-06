@@ -19,18 +19,28 @@ def recipes():
     images = get_uploaded_images()
     return render_template('recipes.html',recipes=images)
 
-@app.route('/myRecipes/<Recipeid>')
-def getRecipe(recipeid):
+@app.route('/myRecipes/<recipieid>')
+def getRecipe(recipieid):
     con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
     cur=con.cursor()
-    cur.execute("select * from recipe where id=Recipeid")
+    stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
+    ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
+    cur.execute(stat,recipieid)
     query = list(cur.fetchall())
-    print(query)
+    cur.execute(ing,recipieid)
+    query2 = list(cur.fetchall())
+    name = query[0][0]
+    date = query[0][1]
+    lst = [name,date]
+    lst2 = []
+    for i in query:
+        lst2.append([i[2],i[3]])
+    print(query2)
     cur.close()
     con.close()
     if query  is None:
         return redirect(url_for('home'))
-    return render_template("recipie_view.html", query=query)
+    return render_template("recipie_view.html", query=lst, lst2 =lst2, query2=query2)
 
 
 @app.route('/myRecipes')
