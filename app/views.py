@@ -17,6 +17,7 @@ con= pymysql.connect(
     )
 
 
+
 @app.route('/')
 def home():
     """Render website's home page."""
