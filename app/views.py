@@ -10,7 +10,13 @@ from app.models import User
 import pymysql
 
 
-
+def db_connect():
+    '''Connects to mysql database using environment variables'''
+    return pymysql.connect(host=app.config['DATABASE_HOST'],
+                             user=app.config['DATABASE_USER'],
+                             password=app.config['DATABASE_PASSWORD'],
+                             database=app.config['DATABASE_NAME'],
+                             cursorclass=pymysql.cursors.DictCursor)
 
 @app.route('/')
 def home():
@@ -115,15 +121,9 @@ def mealPlan():
 # @login_required
 def pantry():
     """Render website's pantry page."""
-    conn = pymysql.connect(host='localhost',
-                             user='root',
-                             password='',
-                             database='meal_planner',
-                             cursorclass=pymysql.cursors.DictCursor)
-    #conn = pymysql.connect(host= "localhost",database="meal_planner",user="root",password="",)
+    conn = db_connect()
     with conn:
         with conn.cursor() as cursor:
-            # Read a single record
             sql_query = "select quantity, name, unit from users as u \
                 join stores as s on u.user_id=s.user_id \
                     join ingredients as i on s.ingredient_id=i.ingredient_id \
