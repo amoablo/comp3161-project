@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 from .forms import LoginForm
 import os
 from flask.helpers import send_from_directory
+import pymysql
 
 @app.route('/')
 def home():
@@ -17,6 +18,51 @@ def recipes():
     """Render website's recipes page."""
     images = get_uploaded_images()
     return render_template('recipes.html',recipes=images)
+
+@app.route('/myRecipes/<recipieid>')
+def getRecipe(recipieid):
+    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    cur=con.cursor()
+    stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
+    ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
+    cur.execute(stat,recipieid)
+    query = list(cur.fetchall())
+    cur.execute(ing,recipieid)
+    query2 = list(cur.fetchall())
+    name = query[0][0]
+    date = query[0][1]
+    lst = [name,date]
+    lst2 = []
+    for i in query:
+        lst2.append([i[2],i[3]])
+    print(query2)
+    cur.close()
+    con.close()
+    if query  is None:
+        return redirect(url_for('home'))
+    return render_template("recipie_view.html", query=lst, lst2 =lst2, query2=query2)
+
+
+@app.route('/myRecipes')
+#@login_required
+def myRecipes():
+    """Render website's Personal Recipes Uploaded, My Recipes page."""
+    #connect to the db
+    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    #cursor (two cursor server side and client side)
+    cur=con.cursor()
+    #execute
+    cur.execute("select * from recipe")
+    # returns array of tuples
+    #rows=cur.fetchall()
+    recipieList = list(cur.fetchall())
+    print(recipieList)
+    #for r in rows:
+     #   print(f"Name:{r[1]}  Date: {r[2]}")
+    cur.close()
+    #close the connection
+    con.close()
+    return render_template('myRecipes.html',lst = recipieList)
 
 @app.route('/mealPlan')
 @login_required
