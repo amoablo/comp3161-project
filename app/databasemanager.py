@@ -171,22 +171,10 @@ def removeRecipe(id):
 
 def getAllIngredients(recipe_id):
     command = """
-    SELECT ingredients.ingredient_id, ingredients.name, ingr_unit.unit, ingr_quan.amount
-    FROM (SELECT made_of.ingredient_id, made_of.amount
-            FROM made_of
-            WHERE made_of.recipe_id = {}) ingr_quan
+    call getingredients(%s)
+    """
 
-    LEFT JOIN ingredients
-    ON ingr_quan.ingredient_id = ingredients.ingredient_id
-
-    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
-                FROM measured_in
-                LEFT JOIN measurement
-                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
-    on ingr_quan.ingredient_id = ingr_unit.ingredient_id
-    """.format(recipe_id)
-
-    cursor.execute(command)
+    cursor.execute(command,(recipe_id,))
     response = cursor.fetchall()
 
     ingredients = []
@@ -204,17 +192,9 @@ def getAllIngredients(recipe_id):
 
 def getIngredient(id):
     command = """
-    SELECT ingred.ingredient_id, ingred.name, ingr_unit.unit
-    FROM (Select * from ingredients
-        WHERE ingredients.ingredient_id = {}) ingred
-
-    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
-                FROM measured_in
-                LEFT JOIN measurement
-                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
-    on ingred.ingredient_id = ingr_unit.ingredient_id
-    """.format(id)
-    cursor.execute(command)
+    call getingredient(%s)
+    """
+    cursor.execute(command, (id,))
     response = cursor.fetchall()
 
     fetchIngred = None

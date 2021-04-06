@@ -200,16 +200,42 @@ create table creates(
 );
 
 -- Stored Procedures
+
 DELIMITER //
 
 -- Procedures go here 
 
--- CREATE PROCEDURE Testi()
--- BEGIN
--- 	SELECT *  FROM products;
--- END //
+CREATE PROCEDURE getingredients(IN RID int)          
+BEGIN          
+SELECT ingredients.ingredient_id, ingredients.name, ingr_unit.unit, ingr_quan.amount
+    FROM (((SELECT made_of.ingredient_id, made_of.amount
+            FROM made_of
+            WHERE made_of.recipe_id = RID) ingr_quan
+    LEFT JOIN ingredients
+    ON ingr_quan.ingredient_id = ingredients.ingredient_id)
+
+    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
+                FROM measured_in
+                LEFT JOIN measurement
+                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
+    on ingr_quan.ingredient_id = ingr_unit.ingredient_id);
+END //
+
+CREATE PROCEDURE getingredient(IN I_ID int)          
+BEGIN          
+SELECT ingred.ingredient_id, ingred.name, ingr_unit.unit
+    FROM ((Select * from ingredients
+        WHERE ingredients.ingredient_id = I_ID) ingred
+
+    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
+                FROM measured_in
+                LEFT JOIN measurement
+                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
+    on ingred.ingredient_id = ingr_unit.ingredient_id);
+END //
 
 DELIMITER ;
+
 
 -- =========================
 --       Insertions
