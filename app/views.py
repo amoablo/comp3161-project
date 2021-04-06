@@ -9,12 +9,6 @@ from flask.helpers import send_from_directory
 from app.models import User
 import pymysql
 
-con= pymysql.connect(
-    host= "localhost",
-    database="mealplanner",
-    user="root",
-    password="",
-    )
 
 
 
@@ -28,7 +22,7 @@ def recipes():
     """Render website's recipes page."""
     #images = get_uploaded_images()
     #connect to the db
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     #cursor (two cursor server side and client side)
     cur=con.cursor()
     #execute
@@ -46,7 +40,7 @@ def recipes():
 
 @app.route('/myRecipes/<recipieid>')
 def getRecipe(recipieid):
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     cur=con.cursor()
     stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
     ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
@@ -73,7 +67,7 @@ def getRecipe(recipieid):
 def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
     #connect to the db
-    con= pymysql.connect(host= "localhost",database="testq",user="root",password="",)
+    con = db_connect()
     #cursor (two cursor server side and client side)
     cur=con.cursor()
     #execute
@@ -126,17 +120,9 @@ def pantry():
 @app.route('/shoppingList')
 #@login_required
 def shoppingList():
-    cur=con.cursor()
-    cur.execute("SELECT * from ingredients")
-    rows=cur.fetchall()
-    row=[]
-    for r in rows:
-        row.append(f"{r[1]}")
-    con.commit()
-    cur.close()
-    con.close()
+    
     """Render website's shopping list page."""
-    return render_template('shoppinglist.html',row=row)
+    return render_template('shoppinglist.html')
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -187,6 +173,7 @@ def join():
             email = form.email.data
             password = form.password.data
             
+            con = db_connect()
             cur=con.cursor()
             sql="INSERT INTO users(first_name,last_name,email,gender,password) VALUES(%s,%s,%s,%s,%s)"
             cur.execute(sql,(firstname,lastname,email,gender,password))
