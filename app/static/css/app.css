@@ -180,3 +180,7 @@ footer{
 .gender-group{
     padding-bottom: 1rem !important;
 }
+.form-check-input:checked {
+    background-color: #519872;
+    border-color: #519872;
+}

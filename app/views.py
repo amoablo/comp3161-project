@@ -10,14 +10,6 @@ from app.models import User
 import pymysql
 
 
-def db_connect():
-    '''Connects to mysql database using environment variables'''
-    return pymysql.connect(host=app.config['DATABASE_HOST'],
-                             user=app.config['DATABASE_USER'],
-                             password=app.config['DATABASE_PASSWORD'],
-                             database=app.config['DATABASE_NAME'],
-                             cursorclass=pymysql.cursors.DictCursor)
-
 @app.route('/')
 def home():
     """Render website's home page."""
@@ -36,7 +28,7 @@ def recipes():
     # returns array of tuples
     #rows=cur.fetchall()
     recipieList = list(cur.fetchall())
-    print(recipieList)
+    # print(recipieList)
     #for r in rows:
      #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
@@ -81,7 +73,7 @@ def myRecipes():
     # returns array of tuples
     #rows=cur.fetchall()
     recipieList = list(cur.fetchall())
-    print(recipieList)
+    # print(recipieList)
     #for r in rows:
      #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
@@ -105,7 +97,7 @@ def mealPlan():
             result = cursor.fetchall()
             calories = form.calories.data
             not_found = True
-            print(result)
+            # print(result)
             # while not_found:
             #     random.randrange(1, length(result))
             return render_template('mealplan.html', plan=result)
@@ -187,7 +179,7 @@ def join():
             # Get the username and password values from the form.
             firstname=form.firstname.data
             lastname=form.lastname.data
-            gender=form.gender.data
+            gender = request.form['genderOptions']
             email = form.email.data
             password = form.password.data
             
@@ -240,15 +232,14 @@ def load_user(user_id):
                 return User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
     return None
 
-# Connect to the database
 def db_connect():
+    '''Connects to mysql database using environment variables'''
     return pymysql.connect(host=app.config['DATABASE_HOST'],
                              user=app.config['DATABASE_USER'],
                              password=app.config['DATABASE_PASSWORD'],
                              database=app.config['DATABASE_NAME'],
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
-
 
 @app.route('/recipes/<filename>')
 def getImage(filename):
