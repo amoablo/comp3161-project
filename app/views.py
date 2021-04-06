@@ -4,6 +4,7 @@ from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import LoginForm
+from .databasemanager import *
 import os
 from flask.helpers import send_from_directory
 
@@ -116,6 +117,14 @@ def get_uploaded_images():
         for filename in files:
             uploaded_images.append(filename)
     return uploaded_images
+
+
+@app.route('/test/db')
+def testdb():
+    res = []
+    print(recipe())
+    return res
+
 
 # Flash errors from the form if validation fails with Flask-WTF
 # http://flask.pocoo.org/snippets/12/
