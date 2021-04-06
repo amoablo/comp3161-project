@@ -81,6 +81,7 @@ def mealPlan():
             result = cursor.fetchall()
             calories = form.calories.data
             not_found = True
+            print(result)
             # while not_found:
             #     random.randrange(1, length(result))
             return render_template('mealplan.html', plan=result)
@@ -122,8 +123,7 @@ def login():
                 sql = "SELECT * FROM users WHERE email = %s and password = %s"
                 cursor.execute(sql, (email, password))
                 user = cursor.fetchone()
-                user = User(user["user_id"], user["first_name"], user["last_name"], user["email"],\
-                     user["password"])
+                user = User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["password"])
                 # validate the password and ensure that a user was found
                 if user is not None and user.password == password:
                     login_user(user)    # load into session
