@@ -3,9 +3,18 @@ from flask import render_template, request, redirect, url_for, flash
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from .forms import LoginForm
+from .forms import LoginForm,SignUpForm
 import os
 from flask.helpers import send_from_directory
+import pymysql
+
+con= pymysql.connect(
+    host= "localhost",
+    database="mealplanner",
+    user="root",
+    password="",
+    )
+
 
 @app.route('/')
 def home():
@@ -31,10 +40,19 @@ def pantry():
     return render_template('pantry.html')
 
 @app.route('/shoppingList')
-@login_required
+#@login_required
 def shoppingList():
+    cur=con.cursor()
+    cur.execute("SELECT * from ingredients")
+    rows=cur.fetchall()
+    row=[]
+    for r in rows:
+        row.append(f"{r[1]}")
+    con.commit()
+    cur.close()
+    con.close()
     """Render website's shopping list page."""
-    return render_template('shoppinglist.html')
+    return render_template('shoppinglist.html',row=row)
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -66,24 +84,37 @@ def login():
 def join():
     if current_user.is_authenticated:
         return redirect(url_for('recipe'))
-    form = LoginForm()
+    form = SignUpForm()
     if request.method == "POST":
         if form.validate_on_submit():
             # Get the username and password values from the form.
-            email = form.username.data
+            firstname=form.firstname.data
+            lastname=form.lastname.data
+            gender=form.gender.data
+            email = form.email.data
             password = form.password.data
-
+            
+            cur=con.cursor()
+            sql="INSERT INTO users(first_name,last_name,email,gender,password) VALUES(%s,%s,%s,%s,%s)"
+            cur.execute(sql,(firstname,lastname,email,gender,password))
+            con.commit()
+            cur.close()
+            con.close()
+            flash('Joined successfully.', 'success')
+            return redirect(url_for("login"))
+        else:
+            flash('Information invalid.', 'danger')
             # query database for a user based on the username
 
-            user = ''
+            # user = ''
 
-            # validate the password and ensure that a user was found
-            if user is not None and check_password_hash(user.password, password):
-                login_user(user)    # load into session
-                flash('Joined successfully.', 'success') # flash a message to the user
-                return redirect(url_for("recipes"))  # redirect to a secure-page route
-            else:
-                flash('Username or Password is incorrect.', 'danger')
+            # # validate the password and ensure that a user was found
+            # if user is not None and check_password_hash(user.password, password):
+            #     login_user(user)    # load into session
+            #     flash('Joined successfully.', 'success') # flash a message to the user
+            #     return redirect(url_for("recipes"))  # redirect to a secure-page route
+            # else:
+            #     flash('Username or Password is incorrect.', 'danger')
     flash_errors(form)
     return render_template("join.html", form=form)
 

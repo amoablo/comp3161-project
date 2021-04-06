@@ -12,6 +12,10 @@ meal_planner_fake_sql = """-- Meal Planner Fake Data and tables
    must drop tables with foreign keys first
    due to referential integrity constraints
  */
+
+create database mealplanner;
+use mealplanner;
+
 drop table IF EXISTS users cascade;
 drop table IF EXISTS meal_plan cascade;
 drop table IF EXISTS meal cascade;
@@ -567,3 +571,6 @@ for indx in range(len(fake_data["creates"]["user_id"])):
 text_file = open("meal_planer_fake_data.sql", "w")
 text_file.write(meal_planner_fake_sql)
 text_file.close()
+
+#select distinct recipe.name, ingredients.name from made_of Join recipe on recipe.recipe_id=made_of.recipe_id Join ingredients on ingredients.ingredient_id=made_of.ingredient_id where recipe.recipe_id=1;
+#select recipe.name from made_from join recipe on recipe.recipe_id=made_from.recipe_id;
