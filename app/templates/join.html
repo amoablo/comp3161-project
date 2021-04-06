@@ -10,16 +10,25 @@
 
         <h4 class='form-header'>Join</h4>
         <div class="form-group">
-            {{ form.firstname.label }} {{ form.firstname(class='form-control', placeholder="Firstname") }}
+            {{ form.firstname.label }} {{ form.firstname(class='form-control', placeholder="firstname") }}
         </div>
         <div class="form-group">
-            {{ form.lastname.label }} {{ form.lastname(class='form-control', placeholder="Lastname") }}
+            {{ form.lastname.label }} {{ form.lastname(class='form-control', placeholder="lastname") }}
         </div>
         <div class="form-group">
             {{ form.email.label }} {{ form.email(class='form-control', placeholder="email") }}
         </div>
-        <div class="form-group">
-            {{ form.gender.label }} {{ form.gender(class='form-control', placeholder="M or F") }}
+        <div class="form-group gender-group">
+            {{ form.gender.label(class='d-block') }}
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio1" value="M">
+                <label class="form-check-label" for="inlineRadio1">M</label>
+            </div>
+            <div class="form-check form-check-inline">
+                <input class="form-check-input" type="radio" name="inlineRadioOptions" id="inlineRadio2" value="F">
+                <label class="form-check-label" for="inlineRadio2">F</label>
+            </div>
+            <!-- {{ form.gender.label }} {{ form.gender(class='form-control', placeholder="M or F") }} -->
         </div>
         <div class="form-group">
             {{ form.password.label }} {{ form.password(class='form-control', placeholder="password") }}

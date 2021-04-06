@@ -8,7 +8,7 @@ body {
     color: #F4F4F9;
     padding-left: 2%;
     padding-right: 2%;
-    font-size:medium;
+    font-size: medium;
 }
 .navbar-brand{
     font-family: 'Cinzel Decorative', cursive;
@@ -176,4 +176,7 @@ footer{
 .members-heading{
     display: flex;
     justify-content: center;
+}
+.gender-group{
+    padding-bottom: 1rem !important;
 }
