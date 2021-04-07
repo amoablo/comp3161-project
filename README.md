@@ -41,3 +41,8 @@ python run.py
  python flask-migrate.py db migrate
  python flask-migrate.py db upgrade
 ```
+
+**Manually upload sql file to postgres**
+```
+psql -h ec2-54-205-183-19.compute-1.amazonaws.com -d d6saqont4qut5i -U spareowusrudfi -p 5432 < meal_planer_fake_data.sql 
+```
