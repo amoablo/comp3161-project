@@ -1,14 +1,16 @@
+import os
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash, Markup
 from flask_login import login_user, logout_user, current_user, login_required
+from flask.helpers import send_from_directory
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .databasemanager import *
-from .forms import LoginForm,SignUpForm,MealPlanForm
-import os
-from flask.helpers import send_from_directory
-from app.models import User
+from .forms import *
+from .models import *
+
 import pymysql
+
 
 
 @app.route('/')
@@ -256,11 +258,7 @@ def get_uploaded_images():
     return uploaded_images
 
 
-@app.route('/test/db')
-def testdb():
-    res = []
-    print(recipe())
-    return res
+
 
 
 # Flash errors from the form if validation fails with Flask-WTF

@@ -33,6 +33,9 @@ db = mysql.connect(host= hostname,
 #                 password= password) 
 
 
+recipe_image_folder = "images/recipe"
+
+
 app.config.from_object(__name__)
 
 # Flask-Login login manager
