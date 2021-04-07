@@ -20,19 +20,21 @@
     <div class="card-deck">	
         {% for p in lst %}
 
-            <div class="card">
+            <div class="card" >
+              <image src="{{ p.image_url }}" class="card-img-top no" alt="..."></image>
                 <div class="recipe">
                   <div class="col">
-                    <h5 class="card-title font-weight-bold mb-1">{{ p[1] }}</h5>
-                    <p class="card-text text-muted"><i class="fas fa-map-marker-alt"></i>  {{ p[2] }}</p>
-                    <span class="badge badge-pill badge-primary px-3 py-2">${{ p[1] }}</span>
+                    <h5 class="card-title font-weight-bold mb-1">{{ p.name }}</h5>
+                    <p class="card-text text-muted"><i class="fas fa-map-marker-alt"></i>  {{ p.date_created }}</p>
+                    <p class="card-text text-muted">Calories: {{ p.calorie }}</p>
+                    <span></span>
                   </div>
                 </div>
                 <span></span>
-                <div class="">
-                  <a class="btn btn-block specific-green" href="{{ url_for('getRecipe', recipieid= p[0]) }}">View Recipie</a>
+                <div class="button-cl">
+                  <button><a class="btn btn-block specific-green" href="{{ url_for('getIndividualRecipe', recipieid= p.id) }}">View Recipie</a></button>
               </div>
-       
+            </div>
                 {% endfor %}
               </div>
 

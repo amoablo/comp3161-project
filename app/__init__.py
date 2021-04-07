@@ -14,15 +14,15 @@ app = Flask(__name__)
 app.config['SECRET_KEY'] = "GqAExVdKcc66GNtuceYYSUSkJ3bhsULZhQZtT2xDrrAtz6KG4M6Xm"
 
 # Setup Database
-# app.config['DATABASE_HOST'] = os.environ.get('DATABASE_HOST')
-# app.config['DATABASE_USER'] = os.environ.get('DATABASE_USER')
-# app.config['DATABASE_PASSWORD'] = os.environ.get('DATABASE_PASSWORD')
-# app.config['DATABASE_NAME'] = os.environ.get('DATABASE_NAME')
+app.config['DATABASE_HOST'] = os.environ.get('DATABASE_HOST')
+app.config['DATABASE_USER'] = os.environ.get('DATABASE_USER')
+app.config['DATABASE_PASSWORD'] = os.environ.get('DATABASE_PASSWORD')
+app.config['DATABASE_NAME'] = os.environ.get('DATABASE_NAME')
 
-app.config['DATABASE_HOST'] = "localhost"
-app.config['DATABASE_USER'] = "comp3161-project2"
-app.config['DATABASE_PASSWORD'] = "comp3161-project2"
-app.config['DATABASE_NAME'] = "finalProject"
+#app.config['DATABASE_HOST'] = "localhost"
+#app.config['DATABASE_USER'] = "comp3161-project2"
+#app.config['DATABASE_PASSWORD'] = "comp3161-project2"
+#app.config['DATABASE_NAME'] = "finalProject"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['UPLOAD_FOLDER_RECIPE'] = './app/static/uploads/images/recipe'

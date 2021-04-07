@@ -6,20 +6,20 @@
 		<div class="row no-gutters">
 			<div class="col-md-8">
 				<div class="card-body">
-				<h5 class="card-title">{{query[0]}}</h5>
-				<p class="card-text">{{query[1]}}</p>
-
+				<h5 class="card-title">{{recipe.name}}</h5>
+				<p class="card-text">{{recipe.date_created}}</p>
+                <p class="card-text">{{recipe.calorie}}</p>
                <div>
-                    <h6>Step Np. & Description</h6>
-                    {% for p in lst2 %}
-                        <p class="card-text">{{p[0]}}   {{p[1]}}</p>
+                    <h6>Description</h6>
+                    {% for p in instructions %}
+                        <p class="card-text">{{p.name}}</p>
                     {% endfor %}
                </div><br><br>
 
                <div>
                 <h6>Ingredient & Amount Needed</h6>
-                {% for i in query2 %}
-                    <p class="card-text">{{i[0]}}    {{i[1]}}</p>
+                {% for i in  %}
+                    <p class="card-text">{{ingredients.name}}    {{ingredients.quantity}}{{i.unit}}</p>
                 {% endfor %}
            </div>
 
