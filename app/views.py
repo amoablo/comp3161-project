@@ -31,7 +31,7 @@ def recipes():
 
     return render_template('recipes.html',recipes=recipes)
 
-@app.route('/myRecipes/<recipieid>')
+@app.route('/recipeDetails/<recipieid>')
 def getIndividualRecipe(recipieid):
     recipe = getRecipe(recipieid)
     recipe.setInstructions()

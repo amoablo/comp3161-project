@@ -8,12 +8,12 @@
 			<div class="col-md-8">
 				<div class="card-body">
 				<h5 class="card-title">{{recipe.name}}</h5>
-				<p class="card-text">{{recipe.date_created}}</p>
-                <p class="card-text">Calories:{{recipe.calorie}}</p>
+				<p class="card-text">Date Created: {{recipe.date_created}}</p>
+                <p class="card-text">Calories: {{recipe.calorie}}</p>
                <div>
-                    <h5 class="card-title">Description</h5>
+                    <h5 class="card-title">Steps</h5>
                     {% for p in instructions %}
-                        <p class="card-text">{{p.name}}</p>
+                        <p class="card-text">{{p.step_no}}. {{p.description}}</p>
                     {% endfor %}
                </div><br><br>
 
