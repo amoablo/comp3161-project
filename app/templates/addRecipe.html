@@ -7,7 +7,7 @@
     <h2 id='login-page-text'>Add New Recipe</h2>
   </div>
   {% include 'flash_messages.html' %}
-  <form action="{{ url_for('login') }}" method="post" class="login-form rounded">
+  <form action="{{ url_for('login') }}" enctype="multipart/form-data" method="post" class="login-form rounded">
     {{ form.csrf_token }}
     
     <h4 class='form-header'>Join</h4>
@@ -26,6 +26,10 @@
       <div class="form-group">
         {{ form.step_description.label }}
         {{ form.step_description(class='form-control', placeholder="ex. beat eggs") }}
+      </div>
+      <div class="form-group">
+        {{ form.image.label }}
+        {{ form.image}}
       </div>
     <div class="submit-btn-container d-flex justify-content-center">
       <button type="submit" name="submit" class="btn custom-btn submit-btn">Submit</button>

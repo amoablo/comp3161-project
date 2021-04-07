@@ -9,7 +9,7 @@ sql_filename = "meal_planer_fake_data.sql"
 num_fake_users = 20
 num_fake_recipes = 60 # should be greater than number of fake users
 
-num_ingredients = 20
+num_ingredients = 40
 max_num_recipe_ingredient = 10 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
 # max_ingredient_quantity = 5

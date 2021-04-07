@@ -6,9 +6,16 @@ from flask.helpers import send_from_directory
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import *
+<<<<<<< HEAD
+# from .databasemanager import *
+=======
+>>>>>>> 8b8b09bc163a95e2bc7a0e6994260ad4d9b215d9
+import os, random
+from flask.helpers import send_from_directory
+from app.models import *
 from .models import *
-
 import pymysql
+from datetime import datetime
 
 
 
@@ -20,21 +27,11 @@ def home():
 @app.route('/recipes')
 def recipes():
     """Render website's recipes page."""
-    #images = get_uploaded_images()
-    #connect to the db
     con = db_connect()
-    #cursor (two cursor server side and client side)
     cur=con.cursor()
-    #execute
     cur.execute("select * from recipe")
-    # returns array of tuples
-    #rows=cur.fetchall()
     recipieList = list(cur.fetchall())
-    # print(recipieList)
-    #for r in rows:
-     #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
-    #close the connection
     con.close()
     return render_template('recipes.html',recipes=recipieList)
 
@@ -68,20 +65,46 @@ def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
     #connect to the db
     con = db_connect()
-    #cursor (two cursor server side and client side)
     cur=con.cursor()
-    #execute
-    cur.execute("select * from recipe")
-    # returns array of tuples
-    #rows=cur.fetchall()
+    user_id = current_user.get_id()
+    sql = "select * from recipe where recipe_id in(SELECT recipe_id FROM creates WHERE user_id = %s)"
+    cur.execute(sql,user_id)
     recipieList = list(cur.fetchall())
-    # print(recipieList)
-    #for r in rows:
-     #   print(f"Name:{r[1]}  Date: {r[2]}")
     cur.close()
     #close the connnection
     con.close()
     return render_template('myRecipes.html',lst = recipieList)
+
+@app.route("/addRecipe", methods=["GET", "POST"])
+def addRecipe():
+    form = RecipeForm()
+    if request.method == "POST" and form.validate_on_submit():
+
+        name = form.name.data 
+        calories = form.calories.data
+        number_of_steps = form.number_of_steps.data
+        step_description = form.step_description.data
+        image = request.files['image']
+        filename = secure_filename(image.filename)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        date = datetime.today().strftime('%Y-%m-%d')
+
+        con = db_connect()
+        cur=con.cursor()
+        recipe = 'insert into recipe values(%s %s %s);'
+        cur.execute(recipe,name,date,filename)
+        for i in number_of_steps:
+            instruction = 'insert into instructions values(%s %s);'
+            cur.execute(instruction,i,instruction)
+
+        cur.close()
+        con.close()
+
+        flash('Recipie Saved', 'success')
+        return redirect('/myRecipes')
+    else:
+        flash_errors(form)
+    return render_template('addRecipe.html',form=form)
 
 
 @app.route('/mealPlan', methods=['GET','POST'])
@@ -145,22 +168,26 @@ def mealPlan():
             flash("Your meal plan has been generated", "success")
             return redirect('/mealPlan')
         # else
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         breakfast = cursor.fetchall()
-        sql = "SELECT DISTINCT recipe.*, meal.num_servings FROM recipe JOIN meal WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         lunch = cursor.fetchall()
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         dinner = cursor.fetchall() 
         cursor.close()
         connection.close()
         # collapse into one dictionary
         length = len(breakfast) + len(lunch) +len(dinner)
-        print(length)
         plan = {"breakfast":breakfast, "lunch":lunch, "dinner":dinner}
-        return render_template('mealplan.html',length=length, plan=plan, form=form)
+        calories = 0
+        for subplan in plan.values():
+            for meal in subplan:
+                calories += meal['calorie'] * meal['num_servings']
+        
+        return render_template('mealplan.html',total_calories=calories, length=length, plan=plan, form=form)
     flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
