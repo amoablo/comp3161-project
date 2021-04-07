@@ -1,14 +1,15 @@
+import os, random
 from app import app, db, login_manager
 from flask import render_template, request, redirect, url_for, flash, Markup
 from flask_login import login_user, logout_user, current_user, login_required
+from flask.helpers import send_from_directory
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from .forms import LoginForm,SignUpForm,MealPlanForm
-from .databasemanager import *
-import os, random
-from flask.helpers import send_from_directory
-from app.models import *
+from .forms import *
+from .models import *
+
 import pymysql
+
 
 
 @app.route('/')
@@ -181,12 +182,19 @@ def pantry():
                 return redirect(url_for('home'))
     return render_template('pantry.html', ingredients=result)
 
+
 @app.route('/shoppingList')
 #@login_required
 def shoppingList():
-    
+    ingredients = []
+    if current_user.is_authenticated:
+        current_user.setShoppingList()
+        ingredients = current_user.shoppingList
+    else:
+        flash('You need to login first.', 'danger')   
     """Render website's shopping list page."""
-    return render_template('shoppinglist.html')
+    return render_template('shoppinglist.html', Shopping_ingredients=ingredients)
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
@@ -319,22 +327,18 @@ def find_days(recipes, calories):
 @app.route('/recipes/<filename>')
 def getImage(filename):
     root_dir = os.getcwd()
-    return send_from_directory(os.path.join(root_dir, './uploads'),filename)
+    return send_from_directory(os.path.join(root_dir, app.config['UPLOAD_FOLDER_RECIPE']),filename)
 
 def get_uploaded_images():
     uploaded_images = []
     rootdir = os.getcwd()
-    for subdir, dirs, files in os.walk(rootdir + '/uploads'):
+    for subdir, dirs, files in os.walk(rootdir + app.config['UPLOAD_FOLDER_RECIPE']):
         for filename in files:
             uploaded_images.append(filename)
     return uploaded_images
 
 
-@app.route('/test/db')
-def testdb():
-    res = []
-    print(recipe())
-    return res
+
 
 
 # Flash errors from the form if validation fails with Flask-WTF

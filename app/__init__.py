@@ -13,28 +13,37 @@ app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "GqAExVdKcc66GNtuceYYSUSkJ3bhsULZhQZtT2xDrrAtz6KG4M6Xm"
 
-# Setup SQLAlchemy
-app.config['SQLALCHEMY_DATABASE_URI'] = ""
-app.config['DATABASE_HOST'] = os.environ.get('DATABASE_HOST')
-app.config['DATABASE_USER'] = os.environ.get('DATABASE_USER')
-app.config['DATABASE_PASSWORD'] = os.environ.get('DATABASE_PASSWORD')
-app.config['DATABASE_NAME'] = os.environ.get('DATABASE_NAME')
+# Setup Database
+# app.config['DATABASE_HOST'] = os.environ.get('DATABASE_HOST')
+# app.config['DATABASE_USER'] = os.environ.get('DATABASE_USER')
+# app.config['DATABASE_PASSWORD'] = os.environ.get('DATABASE_PASSWORD')
+# app.config['DATABASE_NAME'] = os.environ.get('DATABASE_NAME')
+
+app.config['DATABASE_HOST'] = "localhost"
+app.config['DATABASE_USER'] = "comp3161-project2"
+app.config['DATABASE_PASSWORD'] = "comp3161-project2"
+app.config['DATABASE_NAME'] = "finalProject"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
-app.config['UPLOAD_FOLDER'] = './uploads'
+app.config['UPLOAD_FOLDER_RECIPE'] = './app/static/uploads/images/recipe'
+app.config['UPLOAD_FOLDER'] = './app/static/uploads'
+
 
 # Connect to mysql database
-db = mysql.connect(host= app.config['DATABASE_HOST'], 
-                database= app.config['DATABASE_NAME'],
-                user= app.config['DATABASE_USER'],
-                password= app.config['DATABASE_PASSWORD'])   
+def connectdb():
+    db = mysql.connect(host= app.config['DATABASE_HOST'], 
+                    database= app.config['DATABASE_NAME'],
+                    user= app.config['DATABASE_USER'],
+                    password= app.config['DATABASE_PASSWORD'])   
 
-# Connect to postgress databse
-# db = psycopg2.connect(host= hostname, 
-#                 database= database,
-#                 user= username,
-#                 password= password) 
+    # Connect to postgress databse
+    # db = psycopg2.connect(host= hostname, 
+    #                 database= database,
+    #                 user= username,
+    #                 password= password) 
+    return db
 
+db = connectdb()
 
 app.config.from_object(__name__)
 
