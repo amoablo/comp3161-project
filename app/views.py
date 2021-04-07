@@ -40,6 +40,8 @@ def getIndividualRecipe(recipieid):
     print(instructions)
     ingredients = recipe.ingredients
     print(ingredients)
+    if 'http' not in recipe.image_url:
+            image_url= url_for('getImage', filename=i.image_url)
     
     if recipe  is None:
         return redirect(url_for('home'))
