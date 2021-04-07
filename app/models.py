@@ -870,10 +870,10 @@ def getUserMealPlans(user_id):
     cursor = db.cursor()
 
     command = """
-    SELECT * from meal_plan WHERE meal_plan.mealplan_id in (SELECT schedule.mealplan_id from schedule WHERE schedule.user_id = 1);   
+    SELECT * from meal_plan WHERE meal_plan.mealplan_id in (SELECT schedule.mealplan_id from schedule WHERE schedule.user_id = %s);   
     """
 
-    cursor.execute(command)
+    cursor.execute(command, (user_id,))
     response = cursor.fetchall()
 
     mealplans = []
@@ -886,7 +886,6 @@ def getUserMealPlans(user_id):
                 data[2],
             )
             mealplans.append(mp)
-
     return mealplans
 
 def getMealPlanMeals(mealplan_id):

@@ -15,18 +15,18 @@
               </tr>
             </thead>
             <tbody>
-              {% for ingredient in Shopping_ingredients%}
+              {% for ing in Shopping_ingredients%}
                 <tr>
-                  <th scope="row">{{ ingredient.name }}</th>
-                  {% if ingredient.quantity > 1 %}
+                  <th scope="row">{{ ing.name }}</th>
+                  {% if ing.quantity > 1 %}
                     <td>
-                      {{ ingredient.quantity }} 
-                      {{ ingredient.unit }}s <!-- add an 's' to quantities > 1 -->
+                      {{ ing.quantity }} 
+                      {{ ing.unit }}s <!-- add an 's' to quantities > 1 -->
                     </td>
                   {% else %}
                     <td>
-                      {{ ingredient.quantity }} 
-                      {{ ingredient.unit }}
+                      {{ ing.quantity }} 
+                      {{ ing.unit }}
                     </td>
                   {% endif %}
                 </tr>
