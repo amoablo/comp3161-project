@@ -24,7 +24,7 @@
                 <div class="card-body">
                     <p>Name: {{ recipe.name }}</p>
                     <p>Calorie: {{ recipe.calorie }}</p>
-                    <p>Date: {{ recipe.date_created }}</p>
+                    <p>Creation Date: {{ recipe.date_created }}</p>
                 </div>
                 <div class="">
                     <button><a class="btn btn-block specific-green" href="{{ url_for('getIndividualRecipe', recipieid= recipe.id) }}">View Recipe</a></button>
