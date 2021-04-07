@@ -24,6 +24,11 @@ def home():
 def recipes():
     """Render website's recipes page."""
     recipes = getAllRecipes()
+
+    for i in recipes:
+        if 'http' not in i.image_url:
+            i.image_url= url_for('getImage', filename=i.image_url)
+
     return render_template('recipes.html',recipes=recipes)
 
 @app.route('/myRecipes/<recipieid>')
