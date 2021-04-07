@@ -8,18 +8,18 @@
 				<div class="card-body">
 				<h5 class="card-title">{{recipe.name}}</h5>
 				<p class="card-text">{{recipe.date_created}}</p>
-                <p class="card-text">{{recipe.calorie}}</p>
+                <p class="card-text">Calories:{{recipe.calorie}}</p>
                <div>
-                    <h6>Description</h6>
+                    <h5 class="card-title">Description</h5>
                     {% for p in instructions %}
                         <p class="card-text">{{p.name}}</p>
                     {% endfor %}
                </div><br><br>
 
                <div>
-                <h6>Ingredient & Amount Needed</h6>
-                {% for i in  %}
-                    <p class="card-text">{{ingredients.name}}    {{ingredients.quantity}}{{i.unit}}</p>
+                <h5 class="card-title">Ingredient & Amount Needed</h5>
+                {% for i in ingredients %}
+                    <p class="card-text">{{i.name}}    {{i.quantity}} {{i.unit}}</p>
                 {% endfor %}
            </div>
 
