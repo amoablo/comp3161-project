@@ -109,25 +109,45 @@ def mealPlan():
             while day <= 7:
                 days[day] = find_days(recipes, threshold)
                 day += 1
-            #print(days)
+            print(days)
+            sql = "SELECT mealplan_id FROM schedule WHERE user_id = %s;"
+            cursor.execute(sql, (current_user.get_id()))
+            plan_id = cursor.fetchone()
+            plan_id = plan_id["mealplan_id"]
             for d in days:
-                for meal in d:
+                i = 0
+                for meal in days[d]:
                     if meal != []:
-                        all_meals = getAllMeals()
-                        sql = "INSERT INTO meal VALUES (%d, %d);"
+                        sql = "INSERT INTO meal(calorie, num_servings) VALUES (%s, %s);"
                         cursor.execute(sql, (meal[0]["calorie"], meal[1]))
-
+                        sql = "SELECT meal_id FROM meal WHERE calorie = %s and num_servings = %s;"
+                        cursor.execute(sql, (meal[0]["calorie"], meal[1]))
+                        meal_id = cursor.fetchone()
+                        meal_id = meal_id["meal_id"]
+                        sql = "INSERT INTO made_from(meal_id, recipe_id) VALUES (%s, %s);"
+                        cursor.execute(sql, (meal_id, meal[0]["recipe_id"]))
+                        connection.commit()
+                        if i == 0:
+                            sql = "INSERT INTO breakfast VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                        elif i == 1:
+                            sql = "INSERT INTO lunch VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                        elif i == 2:
+                            sql = "INSERT INTO dinner VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                    connection.commit()
+                    i += 1
             # close connection
             cursor.close()
             connection.close()
             flash("Your meal plan has been generated", "success")
             return redirect('/mealPlan')
         # else
-        print(current_user.get_id())
         sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         breakfast = cursor.fetchall()
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT DISTINCT recipe.*, meal.num_servings FROM recipe JOIN meal WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         lunch = cursor.fetchall()
         sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
