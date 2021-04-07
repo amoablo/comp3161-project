@@ -23,13 +23,13 @@ def home():
 @app.route('/recipes')
 def recipes():
     """Render website's recipes page."""
-    con = db_connect()
-    cur=con.cursor()
-    cur.execute("select * from recipe")
-    recipieList = list(cur.fetchall())
-    cur.close()
-    con.close()
-    return render_template('recipes.html',recipes=recipieList)
+    recipes = getAllRecipes()
+
+    for i in recipes:
+        if 'http' not in i.image_url:
+            i.image_url= url_for('getImage', filename=i.image_url)
+
+    return render_template('recipes.html',recipes=recipes)
 
 @app.route('/myRecipes/<recipieid>')
 def getIndividualRecipe(recipieid):
