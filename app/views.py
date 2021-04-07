@@ -157,9 +157,13 @@ def mealPlan():
         connection.close()
         # collapse into one dictionary
         length = len(breakfast) + len(lunch) +len(dinner)
-        print(length)
         plan = {"breakfast":breakfast, "lunch":lunch, "dinner":dinner}
-        return render_template('mealplan.html',length=length, plan=plan, form=form)
+        calories = 0
+        for subplan in plan.values():
+            for meal in subplan:
+                calories += meal['calorie']
+        
+        return render_template('mealplan.html',total_calories=calories, length=length, plan=plan, form=form)
     flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
