@@ -188,26 +188,17 @@ def mealPlan():
     return redirect(url_for('login'))
 
 @app.route('/pantry')
-# @login_required
+@login_required
 def pantry():
     """Render website's pantry page."""
-    conn = db_connect()
-    with conn:
-        with conn.cursor() as cursor:
-            sql_query = "select quantity, name, unit from users as u \
-                join stores as s on u.user_id=s.user_id \
-                    join ingredients as i on s.ingredient_id=i.ingredient_id \
-                        join measured_in as mi on i.ingredient_id=mi.ingredient_id \
-                            join measurement as m on mi.measurement_id=m.measurement_id"
-            cursor.execute(sql_query)
-            result = (cursor.fetchall())
-            if result is None:
-                return redirect(url_for('home'))
-    return render_template('pantry.html', ingredients=result)
+    if current_user.is_authenticated:
+        current_user.setIngredients()
+        ingr = current_user.ingredients
+    return render_template('pantry.html', ingredients=ingr)
 
 
 @app.route('/shoppingList')
-#@login_required
+@login_required
 def shoppingList():
     ingredients = []
     if current_user.is_authenticated:
