@@ -66,6 +66,7 @@ def myRecipes():
     return render_template('myRecipes.html',lst = recipieList)
 
 @app.route("/addRecipe", methods=["GET", "POST"])
+@login_required
 def addRecipe():
     
     form = RecipeForm()
