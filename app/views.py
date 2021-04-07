@@ -41,8 +41,8 @@ def getIndividualRecipe(recipieid):
     ingredients = recipe.ingredients
     print(ingredients)
     
-     if recipe  is None:
-         return redirect(url_for('home'))
+    if recipe  is None:
+        return redirect(url_for('home'))
     return render_template("recipie_view.html", recipe=recipe, instructions =instructions, ingredients=ingredients)
 
 
