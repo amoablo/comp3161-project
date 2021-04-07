@@ -31,7 +31,7 @@
             <div id="breakfast" class="plan">
                 {% for recipe in plan["breakfast"] %}
                     <div class="plan_item">
-                        <h4>{{ recipe["recipe_name"] }}</h4>
+                        <h4>{{ recipe["name"] }}</h4>
                         <img src="{{ recipe['image_url'] }}" alt="meal_img">
                         <p>Number of Servings: {{ recipe['num_servings'] }}</p>
                         <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
@@ -43,7 +43,7 @@
             <div id="lunch" class="plan">
                 {% for recipe in plan["lunch"] %}
                 <div class="plan_item">
-                    <h4>{{ recipe["recipe_name"] }}</h4>
+                    <h4>{{ recipe["name"] }}</h4>
                     <img src="{{ recipe['image_url'] }}" alt="meal_img">
                     <p>Number of Servings: {{ recipe['num_servings'] }}</p>
                     <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
@@ -55,7 +55,7 @@
             <div id="dinner" class="plan">
                 {% for recipe in plan["dinner"] %}
                 <div class="plan_item">
-                    <h4>{{ recipe["recipe_name"] }}</h4>
+                    <h4>{{ recipe["name"] }}</h4>
                     <img src="{{ recipe['image_url'] }}" alt="meal_img">
                     <p>Number of Servings: {{ recipe['num_servings'] }}</p>
                     <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
