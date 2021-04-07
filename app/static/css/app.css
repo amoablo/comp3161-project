@@ -230,3 +230,7 @@ footer{
     overflow: hidden;
     border-radius: 10px;
 }
+
+.recipe{
+    width: 50%;
+}

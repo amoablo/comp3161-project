@@ -31,7 +31,7 @@ def recipes():
 
     return render_template('recipes.html',recipes=recipes)
 
-@app.route('/myRecipes/<recipieid>')
+@app.route('/recipeDetails/<recipieid>')
 def getIndividualRecipe(recipieid):
     recipe = getRecipe(recipieid)
     recipe.setInstructions()
@@ -40,6 +40,8 @@ def getIndividualRecipe(recipieid):
     print(instructions)
     ingredients = recipe.ingredients
     print(ingredients)
+    if 'http' not in recipe.image_url:
+            image_url= url_for('getImage', filename=i.image_url)
     
     if recipe  is None:
         return redirect(url_for('home'))
