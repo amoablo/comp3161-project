@@ -4,7 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 import os
 import psycopg2
-# import MYSQLdb
+#import MYSQLdb
 import mysql.connector as mysql
 
 
