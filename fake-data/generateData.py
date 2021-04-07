@@ -6,11 +6,9 @@ import random
 
 sql_filename = "meal_planer_fake_data.sql"
 
-# num_fake_users = 200000
-# num_fake_recipes = 600000
+num_fake_users = 200000
+num_fake_recipes = 600000 # should be greater than number of fake users
 
-num_fake_users = 100
-num_fake_recipes = 180 #should be greater than users
 num_ingredients = 20
 max_num_recipe_ingredient = 10 #this needs to be less than or equal to the num_ingredients
 max_ingredient_amount = 10
@@ -52,8 +50,8 @@ meal_planner_fake_sql = """-- Meal Planner Fake Data and tables
    due to referential integrity constraints
  */
 
-create database comp3161_project2_mealplanner;
-use comp3161_project2_mealplanner;
+create database finalProject;
+use finalProject;
 
 drop table IF EXISTS users cascade;
 drop table IF EXISTS meal_plan cascade;

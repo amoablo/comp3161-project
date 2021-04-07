@@ -6,7 +6,6 @@
   <div class="login-form-header d-flex justify-content-center">
     <h2 id='login-page-text'>Meal Planner</h2>
   </div>
-  {% include 'flash_messages.html' %}
   <form action="{{ url_for('login') }}" method="post" class="login-form rounded">
     {{ form.csrf_token }}
     
