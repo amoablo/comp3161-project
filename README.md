@@ -44,5 +44,5 @@ python run.py
 
 **Manually upload sql file to postgres**
 ```
-psql -h ec2-54-205-183-19.compute-1.amazonaws.com -d d6saqont4qut5i -U spareowusrudfi -p 5432 < meal_planer_fake_data.sql 
+mysql -h sql5.freesqldatabase.com -D sql5404063 -u sql5404063 -P 3306 -p < meal_planer_fake_data.sql 
 ```

@@ -1,3 +1,7 @@
+:root{
+    --main-bg-color: #519872;
+}
+
 body {
     padding-top: 5rem;
     background-color: #f4f4f9;
@@ -215,19 +219,48 @@ footer{
     border-color: #519872;
 }
 
-/* #generate{
-    background-image: url(../images/dice.svg);
-    background-repeat: no-repeat;
-    background-position: 50% 50%;
-    /* put the height and width of your image here 
-    height: 50px;
-    width: 50px;
-    border: none;
-  } */
-
-
   /* Shopping List */
   
   #shoppinglist-body{
 
   }
+
+.no{
+      object-fit: cover;
+      object-position: center;
+  }
+
+.card{
+    width: 50%;
+}
+
+.button-cl{
+    padding-bottom: 2em;
+}
+.plan{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    /* grid-auto-rows: 500px makes it responsive */
+}
+
+.plan_item{
+    margin: 1rem;
+    border-radius: 5px;
+    box-shadow: 0px 0px 3px 1px rgb(160, 158, 158);
+    border-top: 5px solid var(--main-bg-color);
+    padding: .3rem;
+}   
+
+.plan_item img{
+    height: 15rem;
+    max-height: 100%;
+    width: 15rem;
+    max-width: 100%;
+    object-fit: cover;
+    overflow: hidden;
+    border-radius: 10px;
+}
+
+.recipe{
+    width: 50%;
+}

@@ -4,22 +4,23 @@
 
 	<div class="card mb-3 sh" style="max-width: 750px;">
 		<div class="row no-gutters">
+            <image src="{{ recipe.image_url }}" class="card-img-top no" alt="..."></image>
 			<div class="col-md-8">
 				<div class="card-body">
-				<h5 class="card-title">{{query[0]}}</h5>
-				<p class="card-text">{{query[1]}}</p>
-
+				<h5 class="card-title">{{recipe.name}}</h5>
+				<p class="card-text">Date Created: {{recipe.date_created}}</p>
+                <p class="card-text">Calories: {{recipe.calorie}}</p>
                <div>
-                    <h6>Step Np. & Description</h6>
-                    {% for p in lst2 %}
-                        <p class="card-text">{{p[0]}}   {{p[1]}}</p>
+                    <h5 class="card-title">Steps</h5>
+                    {% for p in instructions %}
+                        <p class="card-text">{{p.step_no}}. {{p.description}}</p>
                     {% endfor %}
                </div><br><br>
 
                <div>
-                <h6>Ingredient & Amount Needed</h6>
-                {% for i in query2 %}
-                    <p class="card-text">{{i[0]}}    {{i[1]}}</p>
+                <h5 class="card-title">Ingredient & Amount Needed</h5>
+                {% for i in ingredients %}
+                    <p class="card-text">{{i.name}}    {{i.quantity}} {{i.unit}}</p>
                 {% endfor %}
            </div>
 

@@ -26,22 +26,51 @@
         {% if length == 0 %}
             <p> You have no meal plan </p>
         {% else %}
-            <div id="breakfast">
-                <h2>Breakfast</h2>
+            <h3>Total Calories: {{ total_calories }}</h3>
+            <h2>Breakfast</h2>
+            <div id="breakfast" class="plan">
                 {% for recipe in plan["breakfast"] %}
-                    <h4>{{ recipe["recipe_id"] }}</h4>
+                    <div class="plan_item">
+                        <h4>{{ recipe["name"] }}</h4>
+                        <img src="{{ recipe['image_url'] }}" alt="meal_img">
+                        <p>Number of Servings: {{ recipe['num_servings'] }}</p>
+                        <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
+                        <div class="">
+                            <button><a class="btn btn-block specific-green" href="{{ url_for('getIndividualRecipe', recipieid= recipe['recipe_id']) }}">View Recipe</a></button>
+                        </div>
+                    </div>
+                    
                 {% endfor %}
             </div>
-            <div id="lunch">
-                <h2>Lunch</h2>
+
+            <h2>Lunch</h2>
+            <div id="lunch" class="plan">
                 {% for recipe in plan["lunch"] %}
-                    <h4>{{ recipe["recipe_id"] }}</h4>
+                <div class="plan_item">
+                    <h4>{{ recipe["name"] }}</h4>
+                    <img src="{{ recipe['image_url'] }}" alt="meal_img">
+                    <p>Number of Servings: {{ recipe['num_servings'] }}</p>
+                    <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
+                    <div class="">
+                        <button><a class="btn btn-block specific-green" href="{{ url_for('getIndividualRecipe', recipieid= recipe['recipe_id']) }}">View Recipe</a></button>
+                    </div>
+                </div>
+                
                 {% endfor %}
             </div>
-            <div id="dinner">
-                <h2>Dinner</h2>
+
+            <h2>Dinner</h2>
+            <div id="dinner" class="plan">
                 {% for recipe in plan["dinner"] %}
-                    <h4>{{ recipe["recipe_id"] }}</h4>
+                <div class="plan_item">
+                    <h4>{{ recipe["name"] }}</h4>
+                    <img src="{{ recipe['image_url'] }}" alt="meal_img">
+                    <p>Number of Servings: {{ recipe['num_servings'] }}</p>
+                    <p>Calories: {{ recipe['num_servings'] * recipe['calorie'] }}</p>
+                    <div class="">
+                        <button><a class="btn btn-block specific-green" href="{{ url_for('getIndividualRecipe', recipieid= recipe['recipe_id']) }}">View Recipe</a></button>
+                    </div>
+                </div>
                 {% endfor %}
             </div> 
         {% endif %}

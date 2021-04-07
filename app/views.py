@@ -20,55 +20,49 @@ def home():
     """Render website's home page."""
     return render_template('index.html')
 
-@app.route('/recipes')
+@app.route('/recipes', methods=['POST', 'GET'])
 def recipes():
     """Render website's recipes page."""
-    con = db_connect()
-    cur=con.cursor()
-    cur.execute("select * from recipe")
-    recipieList = list(cur.fetchall())
-    cur.close()
-    con.close()
-    return render_template('recipes.html',recipes=recipieList)
+    recipes = []
+    rsearch = rsearchForm()
+    if request.method == 'POST' and rsearch.validate_on_submit():
+          searchValue  = rsearch.rname.data
+          recipes = getRecipes(searchValue)
+    else:
+        recipes = getAllRecipes()
 
-@app.route('/myRecipes/<recipieid>')
-def getRecipe(recipieid):
-    con = db_connect()
-    cur=con.cursor()
-    stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
-    ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
-    cur.execute(stat,recipieid)
-    query = list(cur.fetchall())
-    cur.execute(ing,recipieid)
-    query2 = list(cur.fetchall())
-    name = query[0][0]
-    date = query[0][1]
-    lst = [name,date]
-    lst2 = []
-    for i in query:
-        lst2.append([i[2],i[3]])
-    print(query2)
-    cur.close()
-    con.close()
-    if query  is None:
+    for i in recipes:
+        if 'http' not in i.image_url:
+            i.image_url= url_for('getImage', filename=i.image_url)
+
+    return render_template('recipes.html',recipes=recipes, form=rsearch)
+
+@app.route('/recipeDetails/<recipieid>')
+def getIndividualRecipe(recipieid):
+    recipe = getRecipe(recipieid)
+    recipe.setInstructions()
+    recipe.setIngredients()
+    instructions = recipe.instructions
+    print(instructions)
+    ingredients = recipe.ingredients
+    print(ingredients)
+    if 'http' not in recipe.image_url:
+            image_url= url_for('getImage', filename=i.image_url)
+    
+    if recipe  is None:
         return redirect(url_for('home'))
-    return render_template("recipie_view.html", query=lst, lst2 =lst2, query2=query2)
+    return render_template("recipie_view.html", recipe=recipe, instructions =instructions, ingredients=ingredients)
 
 
 @app.route('/myRecipes')
 @login_required
 def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
-    #connect to the db
-    con = db_connect()
-    cur=con.cursor()
-    user_id = current_user.get_id()
-    sql = "select * from recipe where recipe_id in(SELECT recipe_id FROM creates WHERE user_id = %s)"
-    cur.execute(sql,user_id)
-    recipieList = list(cur.fetchall())
-    cur.close()
-    #close the connnection
-    con.close()
+    current_user.setRecipes()
+    recipieList =  current_user.recipes
+    for i in recipieList:
+        if 'http' not in i.image_url:
+            i.image_url= url_for('getImage', filename=i.image_url)
     return render_template('myRecipes.html',lst = recipieList)
 
 @app.route("/addRecipe", methods=["GET", "POST"])
@@ -195,22 +189,26 @@ def mealPlan():
             flash("Your meal plan has been generated", "success")
             return redirect('/mealPlan')
         # else
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         breakfast = cursor.fetchall()
-        sql = "SELECT DISTINCT recipe.*, meal.num_servings FROM recipe JOIN meal WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         lunch = cursor.fetchall()
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         dinner = cursor.fetchall() 
         cursor.close()
         connection.close()
         # collapse into one dictionary
         length = len(breakfast) + len(lunch) +len(dinner)
-        print(length)
         plan = {"breakfast":breakfast, "lunch":lunch, "dinner":dinner}
-        return render_template('mealplan.html',length=length, plan=plan, form=form)
+        calories = 0
+        for subplan in plan.values():
+            for meal in subplan:
+                calories += meal['calorie'] * meal['num_servings']
+        
+        return render_template('mealplan.html',total_calories=calories, length=length, plan=plan, form=form)
     flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
@@ -218,19 +216,10 @@ def mealPlan():
 @login_required
 def pantry():
     """Render website's pantry page."""
-    conn = db_connect()
-    with conn:
-        with conn.cursor() as cursor:
-            sql_query = "select quantity, name, unit from users as u \
-                join stores as s on u.user_id=s.user_id \
-                    join ingredients as i on s.ingredient_id=i.ingredient_id \
-                        join measured_in as mi on i.ingredient_id=mi.ingredient_id \
-                            join measurement as m on mi.measurement_id=m.measurement_id"
-            cursor.execute(sql_query)
-            result = (cursor.fetchall())
-            if result is None:
-                return redirect(url_for('home'))
-    return render_template('pantry.html', ingredients=result)
+    if current_user.is_authenticated:
+        current_user.setIngredients()
+        ingr = current_user.ingredients
+    return render_template('pantry.html', ingredients=ingr)
 
 
 @app.route('/shoppingList')

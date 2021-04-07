@@ -325,6 +325,29 @@ def getRecipe(id):
    
     return fetchRecipe
 
+def getRecipes(name):
+    cursor = db.cursor()
+
+    command = """select * from recipe where name LIKE "%{}%"; """.format(
+        name
+    )
+    cursor.execute(command)
+    response = cursor.fetchall()
+
+    recipes = []
+
+    if len(response) > 0 :     
+        for data in response:
+            recipes.append(Recipe(
+                data[0],
+                data[1],
+                data[2],
+                data[3],
+                data[4]
+            ))
+
+    return recipes
+
 def addRecipe(recipe):
     cursor = db.cursor()
 
@@ -870,10 +893,10 @@ def getUserMealPlans(user_id):
     cursor = db.cursor()
 
     command = """
-    SELECT * from meal_plan WHERE meal_plan.mealplan_id in (SELECT schedule.mealplan_id from schedule WHERE schedule.user_id = 1);   
+    SELECT * from meal_plan WHERE meal_plan.mealplan_id in (SELECT schedule.mealplan_id from schedule WHERE schedule.user_id = %s);   
     """
 
-    cursor.execute(command)
+    cursor.execute(command, (user_id,))
     response = cursor.fetchall()
 
     mealplans = []
@@ -886,7 +909,6 @@ def getUserMealPlans(user_id):
                 data[2],
             )
             mealplans.append(mp)
-
     return mealplans
 
 def getMealPlanMeals(mealplan_id):
