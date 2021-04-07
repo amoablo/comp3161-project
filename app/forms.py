@@ -20,8 +20,10 @@ class MealPlanForm(FlaskForm):
 class RecipeForm(FlaskForm):
     name = StringField('Name', validators=[InputRequired()])
     calories = IntegerField("Calories", validators=[DataRequired()], description="Number of calories for the meal that will be created from this recipe")
-    number_of_steps = IntegerField("No. of Steps", validators=[DataRequired()], description="Number of steps for to prepare a meal from this recipe")
-    step_description = TextAreaField('Description of Steps', validators=[DataRequired()])
+    ingredient = TextAreaField("Ingredient", validators=[DataRequired()], description="Number of steps for to prepare a meal from this recipe")
+    no_ingredients = IntegerField("No. of Ingredients", validators=[DataRequired()], description="")
+    no_instructions = IntegerField("No. of Instructions", validators=[DataRequired()], description="")
+    instruction = TextAreaField('Instruction', validators=[DataRequired()])
     image = FileField('Image of Meal', validators=[
         FileRequired(),
         FileAllowed(['jpg','png','jpeg'], 'Images only')

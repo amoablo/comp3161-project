@@ -114,6 +114,36 @@ a{
     border: 2px solid rgba(0, 0, 0, 0.15);
     padding: 2.5rem 8rem 2.5rem 8rem;
 }
+.recipe-form{
+    width: 70%;
+    margin-left: auto;
+    margin-right: auto;
+    border: 2px solid rgba(0, 0, 0, 0.15);
+    padding: 2.5rem 8rem 2.5rem 8rem;
+}
+.recipe-form .short-input{
+    width: 50%;
+}
+.recipe-form .form-group{
+    padding-bottom: 0.8rem;
+}
+.add-steps{
+    background-color:#273043;
+    color: #fff !important;
+}  .custom-btn:hover{
+    box-shadow: rgba(0, 0, 0, 0.11) 0px 5px 10px, rgba(0, 0, 0, 0.14) 0px 3px 3px;
+    opacity: 0.9;
+}
+.add-steps:focus{
+    box-shadow: none;
+}
+.add-steps:hover{
+    box-shadow: rgba(0, 0, 0, 0.11) 0px 5px 10px, rgba(0, 0, 0, 0.14) 0px 3px 3px;
+    opacity: 0.9;
+}
+.custom-btn:focus{
+    box-shadow: none;
+}
 .login-form label{
     font-weight: 600;
     padding-bottom: 0.2rem;
