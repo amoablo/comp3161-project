@@ -67,6 +67,7 @@ def myRecipes():
 
 @app.route("/addRecipe", methods=["GET", "POST"])
 def addRecipe():
+    
     form = RecipeForm()
     if request.method == "POST" and form.validate_on_submit():
 
@@ -79,50 +80,25 @@ def addRecipe():
 
         image = request.files['image']
         filename = secure_filename(image.filename)
-        image.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        date = datetime.today().strftime('%Y-%m-%d')
-        con = db_connect()
-        cur=con.cursor()
-        recipeId = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'instructions'"
-        recipe = 'insert into recipe values(%s %s %s %s %s);'
-        cur.execute(recipe,recipeId,name,date,calories,filename)
-        #instruction
-        for i in range(len(inst_list)):
-            instructionId = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'instructions'"
-            instruction = 'insert into instructions values(%s %s %s);'
-            cur.execute(instruction,instructionId,i+1,inst_list[i])
-        #ingredient
-        for i in range(len(ingr_list)):
-            ingredientId = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'ingredients'"
-            ingredient = 'insert into ingredients values(%s %s);'
-            name = ingr_list[i].split()[2]
-            cur.execute(ingredient,ingredientId,)
-        #made_of
-        for i in range(len(ingr_list)):
-            amount = ingr_list[i].split()[0]
-            made_of = 'insert into made_of values(%s s% s%)'
-            cur.execute(made_of,recipeId,ingredientId,amount)
-        #prepare
-        for i in range(len(inst_list)):
-            prepare = 'insert into prepare values(%s s% s%)'
-            cur.execute(prepare,recipeId,ingredientId,i+1)
+        image.save(os.path.join(app.config['UPLOAD_FOLDER_RECIPE'], filename))
+        date = datetime.today()
 
-        #measurement
-        for i in range(len(inst_list)):
-            m_id = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'measurement'"
-            unit = ingr_list[i].split()[1]
-            measurement = 'insert into measurement values(s% s%)'
-            cur.execute(measurement,m_id,unit)
-        #measured_in
-        for i in range(len(inst_list)):
-            measured_in = 'insert into measured_in values(%s s% s%)'
-            cur.execute(measured_in,ingredientId,m_id)
+        recipe  = Recipe(name=name, date_created=date, calorie=calories, image_url=filename)
         
-        cur.close()
-        con.close()
 
-        flash('Recipie Saved', 'success')
-        return redirect('/myRecipes')
+        for ingr in ingr_list:
+            ingr_det = ingr.split(' '); 
+            # test if the ingredient exist
+            test_ingr = getIngredientByName(name)
+            if(test_ingr is not None):
+                recipe.ingredients.append(test_ingr)
+            else:
+                recipe.ingredients.append(Ingredient(name = ingr_det[0], quantity= ingr_det[1], unit= ingr_det[2]))
+
+        addNewRecipe(current_user.id, recipe)
+
+        flash('Recipe Saved', 'success')
+        return redirect(url_for('myRecipes'))
     else:
         flash_errors(form)
     return render_template('addRecipe.html',form=form)

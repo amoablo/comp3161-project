@@ -348,7 +348,7 @@ def getRecipes(name):
 
     return recipes
 
-def addRecipe(recipe):
+def addNewRecipe(user_id, recipe):
     cursor = db.cursor()
 
     command = "insert into recipe (name, created_date, calorie, image_url) values (%s, %s, %s, %s);"
@@ -417,6 +417,35 @@ def getIngredient(id):
     call getingredient(%s);
     """
     cursor.execute(command, (id,))
+    response = cursor.fetchall()
+    dbb.close()
+
+
+    fetchIngred = None
+
+    if len(response) > 0 :        
+        fetchIngred = Ingredient(id = response[0][0], 
+                        name = response[0][1], 
+                        unit  = response[0][2] )
+   
+    return fetchIngred
+
+def getIngredientByName(name):
+    dbb = connectdb() 
+    cursor = dbb.cursor()
+
+    command = """
+    SELECT ingred.ingredient_id, ingred.name, ingr_unit.unit
+    FROM ((Select * from ingredients
+        WHERE ingredients.name = %s) ingred
+
+    LEFT JOIN (SELECT measured_in.ingredient_id , measurement.unit
+                FROM measured_in
+                LEFT JOIN measurement
+                on measured_in.measurement_id = measurement.measurement_id)as ingr_unit
+    on ingred.ingredient_id = ingr_unit.ingredient_id);
+    """
+    cursor.execute(command, (name,))
     response = cursor.fetchall()
     dbb.close()
 
