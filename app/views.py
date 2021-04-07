@@ -6,7 +6,10 @@ from flask.helpers import send_from_directory
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import *
+<<<<<<< HEAD
 # from .databasemanager import *
+=======
+>>>>>>> 8b8b09bc163a95e2bc7a0e6994260ad4d9b215d9
 import os, random
 from flask.helpers import send_from_directory
 from app.models import *
