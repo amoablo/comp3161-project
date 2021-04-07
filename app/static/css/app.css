@@ -184,3 +184,13 @@ footer{
     background-color: #519872;
     border-color: #519872;
 }
+
+/* #generate{
+    background-image: url(../images/dice.svg);
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+    /* put the height and width of your image here 
+    height: 50px;
+    width: 50px;
+    border: none;
+  } */

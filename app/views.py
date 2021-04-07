@@ -3,11 +3,11 @@ from flask import render_template, request, redirect, url_for, flash, Markup
 from flask_login import login_user, logout_user, current_user, login_required
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
-from .databasemanager import *
 from .forms import LoginForm,SignUpForm,MealPlanForm
-import os
+from .databasemanager import *
+import os, random
 from flask.helpers import send_from_directory
-from app.models import User
+from app.models import *
 import pymysql
 
 
@@ -82,32 +82,85 @@ def myRecipes():
     con.close()
     return render_template('myRecipes.html',lst = recipieList)
 
-@login_required
+
 @app.route('/mealPlan', methods=['GET','POST'])
-# @login_required
+@login_required
 def mealPlan():
     """Render website's meal plan page."""
     form = MealPlanForm()
     connection = db_connect()
     if connection is not None:
         cursor = connection.cursor()
-        if request.method == "GET":
+        if request.method == "POST" and form.validate_on_submit():
             user_id = current_user.get_id()
             sql = "SELECT * FROM recipe WHERE recipe_id in (SELECT recipe_id FROM creates WHERE user_id = %s);"
             cursor.execute(sql, (user_id,))
-            result = cursor.fetchall()
+            recipes = cursor.fetchall()
             calories = form.calories.data
             not_found = True
-            # print(result)
-            # while not_found:
-            #     random.randrange(1, length(result))
-            return render_template('mealplan.html', plan=result)
-        sql = "SELECT * FROM recipes;"
-        sql = "INSERT INTO `users` (`email`, `password`) VALUES (%s, %s)"
-        cursor.execute(sql, ('webmaster@python.org', 'very-secret'))
-        result = cursor.fetchone()
+            total_calories = 0
+            days = {}
+            day = 1
+            threshold = calories // 7 # because there are 3 meals in a day
+            """
+                For each day, find meals that meet the weekly 
+                calories divided by 7.
+            """
+            while day <= 7:
+                days[day] = find_days(recipes, threshold)
+                day += 1
+            print(days)
+            sql = "SELECT mealplan_id FROM schedule WHERE user_id = %s;"
+            cursor.execute(sql, (current_user.get_id()))
+            plan_id = cursor.fetchone()
+            plan_id = plan_id["mealplan_id"]
+            for d in days:
+                i = 0
+                for meal in days[d]:
+                    if meal != []:
+                        sql = "INSERT INTO meal(calorie, num_servings) VALUES (%s, %s);"
+                        cursor.execute(sql, (meal[0]["calorie"], meal[1]))
+                        sql = "SELECT meal_id FROM meal WHERE calorie = %s and num_servings = %s;"
+                        cursor.execute(sql, (meal[0]["calorie"], meal[1]))
+                        meal_id = cursor.fetchone()
+                        meal_id = meal_id["meal_id"]
+                        sql = "INSERT INTO made_from(meal_id, recipe_id) VALUES (%s, %s);"
+                        cursor.execute(sql, (meal_id, meal[0]["recipe_id"]))
+                        connection.commit()
+                        if i == 0:
+                            sql = "INSERT INTO breakfast VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                        elif i == 1:
+                            sql = "INSERT INTO lunch VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                        elif i == 2:
+                            sql = "INSERT INTO dinner VALUES (%s, %s);"
+                            cursor.execute(sql, (meal_id, plan_id))
+                    connection.commit()
+                    i += 1
+            # close connection
+            cursor.close()
+            connection.close()
+            flash("Your meal plan has been generated", "success")
+            return redirect('/mealPlan')
+        # else
+        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        cursor.execute(sql, (current_user.get_id()))
+        breakfast = cursor.fetchall()
+        sql = "SELECT DISTINCT recipe.*, meal.num_servings FROM recipe JOIN meal WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        cursor.execute(sql, (current_user.get_id()))
+        lunch = cursor.fetchall()
+        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        cursor.execute(sql, (current_user.get_id()))
+        dinner = cursor.fetchall() 
         cursor.close()
-    connection.close()
+        connection.close()
+        # collapse into one dictionary
+        length = len(breakfast) + len(lunch) +len(dinner)
+        print(length)
+        plan = {"breakfast":breakfast, "lunch":lunch, "dinner":dinner}
+        return render_template('mealplan.html',length=length, plan=plan, form=form)
+    flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
 @app.route('/pantry')
@@ -222,12 +275,12 @@ def logout():
 # user_loader callback. This callback is used to reload the user object from
 # the user ID stored in the session
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(id):
     connection = db_connect()
     with connection:
         with connection.cursor() as cursor:
-            sql = "SELECT * FROM users WHERE user_id = %s"
-            cursor.execute(sql, (user_id))
+            sql = "SELECT * FROM users WHERE user_id = %s;"
+            cursor.execute(sql, (id))
             user = cursor.fetchone()
             if user is not None:
                 return User(user["user_id"], user["first_name"], user["last_name"], user["email"], user["gender"], user["password"])
@@ -241,6 +294,27 @@ def db_connect():
                              database=app.config['DATABASE_NAME'],
                              charset='utf8mb4',
                              cursorclass=pymysql.cursors.DictCursor)
+
+def find_days(recipes, calories):
+    seed = random.randrange(0, len(recipes))
+    total_calories = 0
+    i = 0
+    result = [[],[],[]]
+    while total_calories < calories and i < 10:
+        # print(result)
+        seed = random.randrange(0, len(recipes))
+        if result[i%3] == []:
+            if total_calories + recipes[seed]["calorie"] <= calories:
+                total_calories += recipes[seed]["calorie"]
+                result[i%3].append(recipes[seed])
+                result[i%3].append(1)
+        elif total_calories + result[i%3][0]["calorie"] <= calories:
+            total_calories += result[i%3][0]["calorie"]
+            result[i%3][1] += 1 
+        else:
+            break
+        i += 1
+    return result
 
 @app.route('/recipes/<filename>')
 def getImage(filename):

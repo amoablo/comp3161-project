@@ -2,29 +2,32 @@ from flask import Flask
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
+import os
 import psycopg2
 # import MYSQLdb
 import mysql.connector as mysql
 
 
-import os
 
 app = Flask(__name__)
 
 app.config['SECRET_KEY'] = "GqAExVdKcc66GNtuceYYSUSkJ3bhsULZhQZtT2xDrrAtz6KG4M6Xm"
 
-# Setup database connection
+# Setup SQLAlchemy
+app.config['SQLALCHEMY_DATABASE_URI'] = ""
+app.config['DATABASE_HOST'] = os.environ.get('DATABASE_HOST')
+app.config['DATABASE_USER'] = os.environ.get('DATABASE_USER')
+app.config['DATABASE_PASSWORD'] = os.environ.get('DATABASE_PASSWORD')
+app.config['DATABASE_NAME'] = os.environ.get('DATABASE_NAME')
 
-hostname = 'localhost'
-username = 'comp3161-project2'
-password = 'comp3161-project2'
-database = 'comp3161_project2_mealplanner'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
+app.config['UPLOAD_FOLDER'] = './uploads'
 
 # Connect to mysql database
-db = mysql.connect(host= hostname, 
-                database= database,
-                user= username,
-                password= password)   
+db = mysql.connect(host= app.config['DATABASE_HOST'], 
+                database= app.config['DATABASE_NAME'],
+                user= app.config['DATABASE_USER'],
+                password= app.config['DATABASE_PASSWORD'])   
 
 # Connect to postgress databse
 # db = psycopg2.connect(host= hostname, 
