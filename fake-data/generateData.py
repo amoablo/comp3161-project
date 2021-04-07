@@ -6,8 +6,8 @@ import random
 
 sql_filename = "meal_planer_fake_data.sql"
 
-num_fake_users = 10 #200000
-num_fake_recipes = 30 #600000 # should be greater than number of fake users
+num_fake_users = 20
+num_fake_recipes = 60 # should be greater than number of fake users
 
 num_ingredients = 40
 max_num_recipe_ingredient = 10 #this needs to be less than or equal to the num_ingredients

@@ -150,22 +150,26 @@ def mealPlan():
             flash("Your meal plan has been generated", "success")
             return redirect('/mealPlan')
         # else
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM breakfast WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         breakfast = cursor.fetchall()
-        sql = "SELECT DISTINCT recipe.*, meal.num_servings FROM recipe JOIN meal WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM lunch WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         lunch = cursor.fetchall()
-        sql = "SELECT * FROM recipe WHERE recipe_id IN (SELECT recipe_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
+        sql = "SELECT recipe.*, meal.num_servings FROM recipe, meal WHERE (recipe_id, meal_id) IN (SELECT DISTINCT recipe_id, meal_id FROM made_from WHERE meal_id IN(SELECT meal_id FROM dinner WHERE mealplan_id IN (SELECT mealplan_id FROM meal_plan WHERE mealplan_id in (SELECT mealplan_id FROM schedule WHERE user_id = %s))));"
         cursor.execute(sql, (current_user.get_id()))
         dinner = cursor.fetchall() 
         cursor.close()
         connection.close()
         # collapse into one dictionary
         length = len(breakfast) + len(lunch) +len(dinner)
-        print(length)
         plan = {"breakfast":breakfast, "lunch":lunch, "dinner":dinner}
-        return render_template('mealplan.html',length=length, plan=plan, form=form)
+        calories = 0
+        for subplan in plan.values():
+            for meal in subplan:
+                calories += meal['calorie'] * meal['num_servings']
+        
+        return render_template('mealplan.html',total_calories=calories, length=length, plan=plan, form=form)
     flash("Can't connect to database","danger")
     return redirect(url_for('login'))
 
