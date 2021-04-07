@@ -476,6 +476,14 @@ for m_id in range(len(fake_data["meal"]["calorie"])):
     fake_data["meal_plan"]["week_num"].append( random.randint(1, max_week_num) )
 
 
+# ===========================
+#   populate madefrom table 
+#============================
+for m_id in range(len(fake_data["meal"]["calorie"])):
+    fake_data["made_from"]["meal_id"].append( m_id+1 )
+    fake_data["made_from"]["recipe_id"].append( m_id+1)
+
+
 
 # ===========================
 #   populate breakfast, lunch and dinnertable 
@@ -726,6 +734,25 @@ for indx in range(len(fake_data["meal_plan"]["week_num"])):
         fake_data["meal_plan"]["week_num"][indx],
     )
     meal_planner_fake_sql+= insert_command
+
+
+
+# insert made from
+
+meal_planner_fake_sql += """
+-- Insert made from data
+
+"""
+
+for indx in range(len(fake_data["meal"]["calorie"])):
+    insert_command = """insert into made_from (meal_id, recipe_id) values ( '{}', '{}');
+""".format(
+        fake_data["made_from"]["meal_id"][indx],
+        fake_data["made_from"]["recipe_id"][indx],
+    )
+    meal_planner_fake_sql+= insert_command
+
+
 
 # insert breakfast
 

@@ -6,6 +6,34 @@
     <div class="shoppinglist-header d-flex flex-column align-items-center">
         <h2>Shopping List</h2>
     </div>
+    <div id="shoppinglist-body">
+        <table class="table table-bordered table-striped">
+            <thead class="">
+              <tr>
+                <th scope="col">Ingredient</th>
+                <th scope="col">Quantity</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for ingredient in Shopping_ingredients%}
+                <tr>
+                  <th scope="row">{{ ingredient.name }}</th>
+                  {% if ingredient.quantity > 1 %}
+                    <td>
+                      {{ ingredient.quantity }} 
+                      {{ ingredient.unit }}s <!-- add an 's' to quantities > 1 -->
+                    </td>
+                  {% else %}
+                    <td>
+                      {{ ingredient.quantity }} 
+                      {{ ingredient.unit }}
+                    </td>
+                  {% endif %}
+                </tr>
+              {% endfor %}
+            </tbody>
+        </table>
+    </div>
 </div>
 
 {%endblock%}
