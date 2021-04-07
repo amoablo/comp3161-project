@@ -32,43 +32,29 @@ def recipes():
     return render_template('recipes.html',recipes=recipieList)
 
 @app.route('/myRecipes/<recipieid>')
-def getRecipe(recipieid):
-    con = db_connect()
-    cur=con.cursor()
-    stat = "select recipe.name,recipe.created_date,instructions.step_no,instructions.step_description from recipe join prepare on recipe.recipe_id=prepare.recipe_id join instructions on instructions.instruction_id=prepare.instruction_id and recipe.recipe_id= %s"
-    ing = "select ingredients.name,made_of.amount from ingredients join made_of on ingredients.ingredient_id=made_of.ingredient_id join recipe on recipe.recipe_id=made_of.recipe_id and recipe.recipe_id= %s"
-    cur.execute(stat,recipieid)
-    query = list(cur.fetchall())
-    cur.execute(ing,recipieid)
-    query2 = list(cur.fetchall())
-    name = query[0][0]
-    date = query[0][1]
-    lst = [name,date]
-    lst2 = []
-    for i in query:
-        lst2.append([i[2],i[3]])
-    print(query2)
-    cur.close()
-    con.close()
-    if query  is None:
-        return redirect(url_for('home'))
-    return render_template("recipie_view.html", query=lst, lst2 =lst2, query2=query2)
+def getIndividualRecipe(recipieid):
+    recipe = getRecipe(recipieid)
+    recipe.setInstructions()
+    recipe.setIngredients()
+    instructions = recipe.instructions
+    print(instructions)
+    ingredients = recipe.ingredients
+    print(ingredients)
+    
+     if recipe  is None:
+         return redirect(url_for('home'))
+    return render_template("recipie_view.html", recipe=recipe, instructions =instructions, ingredients=ingredients)
 
 
 @app.route('/myRecipes')
 #@login_required
 def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
-    #connect to the db
-    con = db_connect()
-    cur=con.cursor()
-    user_id = current_user.get_id()
-    sql = "select * from recipe where recipe_id in(SELECT recipe_id FROM creates WHERE user_id = %s)"
-    cur.execute(sql,user_id)
-    recipieList = list(cur.fetchall())
-    cur.close()
-    #close the connnection
-    con.close()
+    current_user.setRecipes()
+    recipieList =  current_user.recipes
+    for i in recipieList:
+        if 'http' not in i.image_url:
+            i.image_url= url_for('getImage', filename=i.image_url)
     return render_template('myRecipes.html',lst = recipieList)
 
 @app.route("/addRecipe", methods=["GET", "POST"])
