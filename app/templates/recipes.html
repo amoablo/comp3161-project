@@ -6,11 +6,16 @@
     <div class="recipe-header d-flex flex-column align-items-center">
         <h2>Recipes</h2>
         <div class="form">
-            <div class="form-group mb-2 search-comp d-flex">
-                <label class="sr-only" for="search">Search</label>
-                <input type="search" name="search" id="search" class="form-control mb-2 mr-sm-2" placeholder="Search Recipes" />
-                <button class="btn mb-2 search-btn custom-btn">Search</button> 
-            </div>
+            <form class = "form-group mb-2 search-comp d-flex" method="POST" enctype="multipart/form-data" action="{{ url_for('recipes') }}">
+                {{ form.csrf_token }}
+
+                {{ form.rname.label(class="sr-only") }}<br/>
+                {{ form.rname(class="form-control mb-2 mr-sm-2", placeholder="Search Recipes") }}<br/>
+                <button type="submit" name="submit" class="btn mb-2 search-btn custom-btn">Search</button> 
+          
+                    
+                </div>
+            </form>
         </div>
     </div>
 </div>

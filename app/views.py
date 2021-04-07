@@ -20,16 +20,22 @@ def home():
     """Render website's home page."""
     return render_template('index.html')
 
-@app.route('/recipes')
+@app.route('/recipes', methods=['POST', 'GET'])
 def recipes():
     """Render website's recipes page."""
-    recipes = getAllRecipes()
+    recipes = []
+    rsearch = rsearchForm()
+    if request.method == 'POST' and rsearch.validate_on_submit():
+          searchValue  = rsearch.rname.data
+          recipes = getRecipes(searchValue)
+    else:
+        recipes = getAllRecipes()
 
     for i in recipes:
         if 'http' not in i.image_url:
             i.image_url= url_for('getImage', filename=i.image_url)
 
-    return render_template('recipes.html',recipes=recipes)
+    return render_template('recipes.html',recipes=recipes, form=rsearch)
 
 @app.route('/recipeDetails/<recipieid>')
 def getIndividualRecipe(recipieid):

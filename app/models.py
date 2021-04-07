@@ -325,6 +325,29 @@ def getRecipe(id):
    
     return fetchRecipe
 
+def getRecipes(name):
+    cursor = db.cursor()
+
+    command = """select * from recipe where name LIKE "%{}%"; """.format(
+        name
+    )
+    cursor.execute(command)
+    response = cursor.fetchall()
+
+    recipes = []
+
+    if len(response) > 0 :     
+        for data in response:
+            recipes.append(Recipe(
+                data[0],
+                data[1],
+                data[2],
+                data[3],
+                data[4]
+            ))
+
+    return recipes
+
 def addRecipe(recipe):
     cursor = db.cursor()
 

@@ -26,3 +26,9 @@ class RecipeForm(FlaskForm):
         FileRequired(),
         FileAllowed(['jpg','png','jpeg'], 'Images only')
     ])
+
+class rsearchForm(FlaskForm):
+    rname=StringField('Recipe_Name', 
+                        validators=[InputRequired()], 
+                        description="Enter recipe name")
+                        
