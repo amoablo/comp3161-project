@@ -8,7 +8,7 @@
     </div>
     <section>
         <h3>Generate Meal Plan</h3>
-        <form action="{{ url_for('mealPlan') }}" method="post" class="">
+        <form name="form" action="{{ url_for('mealPlan') }}" method="post" class="">
             {{ form.csrf_token }}
             
             <h4 class='form-header'>Enter Calories for the Week:</h4>
@@ -16,8 +16,8 @@
               {{ form.calories.label }}
               {{ form.calories(class='form-control', placeholder="14000") }}
             </div>
-            <div class="submit-btn-container d-flex justify-content-center">
-              <button type="submit" name="submit" class="btn custom-btn submit-btn">Create Plan</button>
+            <div class="d-flex justify-content-center">
+              <button id="generate" type="submit" name="submit" class="btn custom-btn submit-btn">Create Plan</button>
             </div>
           </form>
     </section>
@@ -28,20 +28,20 @@
         {% else %}
             <div id="breakfast">
                 <h2>Breakfast</h2>
-                {% for meal in plan["breakfast"] %}
-                    <h4>{{ meal["meal_id"]}}</h4>
+                {% for recipe in plan["breakfast"] %}
+                    <h4>{{ recipe["recipe_id"] }}</h4>
                 {% endfor %}
             </div>
             <div id="lunch">
                 <h2>Lunch</h2>
-                {% for meal in plan["lunch"] %}
-                    <h4>{{ meal["meal_id"]}}</h4>
+                {% for recipe in plan["lunch"] %}
+                    <h4>{{ recipe["recipe_id"] }}</h4>
                 {% endfor %}
             </div>
             <div id="dinner">
                 <h2>Dinner</h2>
-                {% for meal in plan["dinner"] %}
-                    <h4>{{ meal["meal_id"]}}</h4>
+                {% for recipe in plan["dinner"] %}
+                    <h4>{{ recipe["recipe_id"] }}</h4>
                 {% endfor %}
             </div> 
         {% endif %}
