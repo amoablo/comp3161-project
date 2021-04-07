@@ -6,15 +6,11 @@ from flask.helpers import send_from_directory
 from werkzeug.security import check_password_hash
 from werkzeug.utils import secure_filename
 from .forms import *
-<<<<<<< HEAD
 from .databasemanager import *
 import os, random
 from flask.helpers import send_from_directory
 from app.models import *
-=======
 from .models import *
-
->>>>>>> 14dc560dce122e188c9a6a6d8f4e1470de5a52cf
 import pymysql
 from datetime import datetime
 
