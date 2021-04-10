@@ -55,7 +55,7 @@ def getIndividualRecipe(recipieid):
 
 
 @app.route('/myRecipes')
-#@login_required
+@login_required
 def myRecipes():
     """Render website's Personal Recipes Uploaded, My Recipes page."""
     current_user.setRecipes()
@@ -66,6 +66,7 @@ def myRecipes():
     return render_template('myRecipes.html',lst = recipieList)
 
 @app.route("/addRecipe", methods=["GET", "POST"])
+@login_required
 def addRecipe():
     form = RecipeForm()
     if request.method == "POST" and form.validate_on_submit():
@@ -86,9 +87,6 @@ def addRecipe():
         for i in number_of_steps:
             instruction = 'insert into instructions values(%s %s);'
             cur.execute(instruction,i,instruction)
-
-        cur.close()
-        con.close()
 
         flash('Recipie Saved', 'success')
         return redirect('/myRecipes')

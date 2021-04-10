@@ -21,16 +21,16 @@ app.config['SECRET_KEY'] = "GqAExVdKcc66GNtuceYYSUSkJ3bhsULZhQZtT2xDrrAtz6KG4M6X
 
 
 # Local database 
-# app.config['DATABASE_HOST'] = "localhost"
-# app.config['DATABASE_USER'] = "comp3161-project2"
-# app.config['DATABASE_PASSWORD'] = "comp3161-project2"
-# app.config['DATABASE_NAME'] = "finalProject"
+app.config['DATABASE_HOST'] = "localhost"
+app.config['DATABASE_USER'] = "comp3161-project2"
+app.config['DATABASE_PASSWORD'] = "comp3161-project2"
+app.config['DATABASE_NAME'] = "finalProject"
 
 # Deployment database
-app.config['DATABASE_HOST'] = "sql5.freesqldatabase.com"
-app.config['DATABASE_USER'] = "sql5404063"
-app.config['DATABASE_PASSWORD'] = "NJycbejKTE"
-app.config['DATABASE_NAME'] = "sql5404063"
+# app.config['DATABASE_HOST'] = "sql5.freesqldatabase.com"
+# app.config['DATABASE_USER'] = "sql5404063"
+# app.config['DATABASE_PASSWORD'] = "NJycbejKTE"
+# app.config['DATABASE_NAME'] = "sql5404063"
 
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['UPLOAD_FOLDER_RECIPE'] = './app/static/uploads/images/recipe'
