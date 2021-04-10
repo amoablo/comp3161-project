@@ -47,7 +47,7 @@ def getIndividualRecipe(recipieid):
     ingredients = recipe.ingredients
     print(ingredients)
     if 'http' not in recipe.image_url:
-            image_url= url_for('getImage', filename=i.image_url)
+            recipe.image_url= url_for('getImage', filename=recipe.image_url)
     
     if recipe  is None:
         return redirect(url_for('home'))
@@ -71,11 +71,10 @@ def addRecipe():
     
     form = RecipeForm()
     if request.method == "POST" and form.validate_on_submit():
-
         name = form.name.data 
         calories = form.calories.data
         ingredients = form.ingredients.data
-        instructions = form.instructions.DataRequired
+        instructions = form.instructions.data
         ingr_list = ingredients.split(',')
         inst_list = instructions.split(',')
 
@@ -86,7 +85,7 @@ def addRecipe():
 
         recipe  = Recipe(name=name, date_created=date, calorie=calories, image_url=filename)
         
-
+        # add the ingredients
         for ingr in ingr_list:
             ingr_det = ingr.split(' '); 
             # test if the ingredient exist
@@ -94,7 +93,11 @@ def addRecipe():
             if(test_ingr is not None):
                 recipe.ingredients.append(test_ingr)
             else:
-                recipe.ingredients.append(Ingredient(name = ingr_det[0], quantity= ingr_det[1], unit= ingr_det[2]))
+                recipe.ingredients.append(Ingredient(name = ingr_det[0], quantity= int(ingr_det[1]), unit= ingr_det[2]))
+
+        # add the instrcutions
+        for indx in range(len(inst_list)):
+            recipe.instructions.append( Instruction(step_no=indx+1, description=inst_list[indx]))
 
         addNewRecipe(current_user.id, recipe)
 

@@ -6,8 +6,7 @@
   <div class="login-form-header d-flex justify-content-center">
     <h2 id='login-page-text'>Add New Recipe</h2>
   </div>
-  {% include 'flash_messages.html' %}
-  <form action="{{ url_for('login') }}" enctype="multipart/form-data" method="post" class="recipe-form rounded">
+  <form  action="{{ url_for('addRecipe') }}" enctype="multipart/form-data" method="post" class="recipe-form rounded">
     {{ form.csrf_token }}
 
     <h4 class='form-header'>My Recipe</h4>
@@ -21,12 +20,12 @@
     </div>
     <div class="recipe-steps d-flex gap-5 step{{i}}">
         <div class="form-group">
-            {{ form.ingredient.label }}
-            {{ form.ingredient(class='form-control', placeholder="Separate each ingredient by a comma") }}
+            {{ form.ingredients.label }}
+            {{ form.ingredients(class='form-control', placeholder="Separate each ingredient by a comma") }}
           </div>
           <div class="form-group">
-            {{ form.instruction.label }}
-            {{ form.instruction(class='form-control', placeholder="Separate each instruction by a comma") }}
+            {{ form.instructions.label }}
+            {{ form.instructions(class='form-control', placeholder="Separate each instruction by a comma") }}
           </div>
     </div>
 

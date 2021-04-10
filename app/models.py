@@ -363,15 +363,34 @@ def getRecipes(name):
 def addNewRecipe(user_id, recipe):
     cursor = db.cursor()
 
-    command = "insert into recipe (name, created_date, calorie, image_url) values (%s, %s, %s, %s);"
+    command_get_recipe_id = "SELECT `AUTO_INCREMENT` FROM INFORMATION_SCHEMA.TABLES WHERE TABLE_NAME = 'recipe';"
+    command_recipe = "insert into recipe (name, created_date, calorie, image_url) values (%s, %s, %s, %s);"
+    command_create = "insert into creates (user_id, recipe_id) values ( %s, %s);"
 
-    cursor.execute(command,(
+    # get increment value
+    cursor.execute(command_get_recipe_id)
+    response = cursor.fetchall()
+    n_recipe_id = response[0][0]
+    
+    cursor.execute(command_recipe,(
         recipe.name,
         recipe.date_created,
         recipe.calorie,
         recipe.image_url,
     ))
     db.commit()
+
+    cursor.execute(command_create,(
+        user_id,
+        n_recipe_id,
+    ))
+    db.commit()
+    
+    for ingredient in recipe.ingredients:
+        addIngredient(n_recipe_id, ingredient)
+
+    for instruction in recipe.instructions:
+        addInstruction(n_recipe_id, instruction)
 
 def updateRecipe(recipe):
     cursor = db.cursor()
@@ -485,34 +504,44 @@ def addIngredient(recipe_id, n_ingredient):
     response = cursor.fetchall()
     n_ingredient_id = response[0][0]
     
-    # insert ingredient
-    cursor.execute(command_ingr,(
-        n_ingredient.name,
-    ))
-    
-    db.commit()
+    if n_ingredient.id is None:
+        # insert ingredient
+        cursor.execute(command_ingr,(
+            n_ingredient.name,
+        ))
+        
+        db.commit()
 
 
-    # insert made of
-    cursor.execute(command_made_of,(
-        recipe_id,
-        n_ingredient_id,
-        n_ingredient.quantity,
-    ))
+        # insert made of
+        cursor.execute(command_made_of,(
+            recipe_id,
+            n_ingredient_id,
+            n_ingredient.quantity,
+        ))
 
-    db.commit()
+        db.commit()
 
-    #get measurement id and insert measured in
-    cursor.execute(command_getmeasurementid)
-    response = cursor.fetchall()
-    measurement_id = response[0][0]
+        #get measurement id and insert measured in
+        cursor.execute(command_getmeasurementid)
+        response = cursor.fetchall()
+        measurement_id = response[0][0]
 
-    cursor.execute(command_measur,(
-        n_ingredient_id,
-        measurement_id,
-    ))
+        cursor.execute(command_measur,(
+            n_ingredient_id,
+            measurement_id,
+        ))
 
-    db.commit()
+        db.commit()
+    else: 
+        # insert made of
+        cursor.execute(command_made_of,(
+            recipe_id,
+            n_ingredient.id,
+            n_ingredient.quantity,
+        ))
+
+        db.commit()
 
 def updateIngredient(recipe_id, n_ingredient):
     cursor = db.cursor()
