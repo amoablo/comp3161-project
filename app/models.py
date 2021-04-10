@@ -69,6 +69,7 @@ class User(UserMixin):
         self.setMealPlans()
         mealplanMeals = []
         mp_ingredients = []
+        mp_ingredients_no_dup = []
 
         # get all the meals for the mealplans
         for mealPlan in self.mealPlans:
@@ -92,7 +93,18 @@ class User(UserMixin):
                     ingr.quantity += cpy_ingredients[indx].quantity
                     mp_ingredients.remove(cpy_ingredients[indx])
 
-            self.shoppingList.append(ingr)
+            mp_ingredients_no_dup.append(ingr)
+        
+        # remove ingredients that are already in the store
+        self.setIngredients()
+
+        for indx in range(len(mp_ingredients_no_dup)):
+            for ingr_store in self.ingredients:
+                if mp_ingredients_no_dup[indx].id == ingr_store.id:
+                    mp_ingredients_no_dup[indx].quantity -= ingr_store.quantity
+                    break;
+            if mp_ingredients_no_dup[indx].quantity > 0:
+                self.shoppingList.append( mp_ingredients_no_dup[indx])
 
     def is_authenticated(self):
         return True
