@@ -89,15 +89,16 @@ def addRecipe():
         for ingr in ingr_list:
             ingr_det = ingr.split(' '); 
             # test if the ingredient exist
-            test_ingr = getIngredientByName(name)
+            test_ingr = getIngredientByName(ingr_det[0].strip())
             if(test_ingr is not None):
+                test_ingr.quantity = int(ingr_det[1].strip())
                 recipe.ingredients.append(test_ingr)
             else:
-                recipe.ingredients.append(Ingredient(name = ingr_det[0], quantity= int(ingr_det[1]), unit= ingr_det[2]))
+                recipe.ingredients.append(Ingredient(name = ingr_det[0].strip(), quantity= int(ingr_det[1].strip()), unit= ingr_det[2].strip()))
 
         # add the instrcutions
         for indx in range(len(inst_list)):
-            recipe.instructions.append( Instruction(step_no=indx+1, description=inst_list[indx]))
+            recipe.instructions.append( Instruction(step_no=indx+1, description=inst_list[indx].strip()))
 
         addNewRecipe(current_user.id, recipe)
 
